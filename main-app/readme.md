@@ -1,0 +1,2 @@
+Note:
+Tworzymy modułowo, czyli tworzymy w Movemaster\main-app\MoveMaster-app\Assets\Scenes tworzymy folder o odpowiedniej do dodawanej czynności i w nim własną scene. Nigdy bez uzgadaniania nie zmieniamy czegoś w czyimś kodzie, scenie lub prefabie
