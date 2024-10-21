@@ -91,7 +91,7 @@ public class FrameReceiver : MonoBehaviour
     {
         if (receivedTexture != null)
         {
-            GUI.DrawTexture(new Rect(10, 10, 256, 256), receivedTexture);
+            GUI.DrawTexture(new Rect(Convert.ToInt64(1920 / 2), Convert.ToInt64(0), Convert.ToInt64(1920 / 2), Convert.ToInt64(1080)), receivedTexture);
         }
     }
 
