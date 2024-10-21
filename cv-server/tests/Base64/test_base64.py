@@ -3,7 +3,7 @@ import cv2
 from src.Base64.Base64Conversions import *
 
 
-IMAGE_FILENAME = "image.jpg"
+IMAGE_FILENAME = "Base64/image.jpg"
 
 def isBase64(s):
     try:
