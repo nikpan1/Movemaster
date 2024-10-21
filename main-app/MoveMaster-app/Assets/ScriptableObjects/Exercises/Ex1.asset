@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec6b8c9692a4af24e84d1db1952a9287, type: 3}
   m_Name: Ex1
   m_EditorClassIdentifier: 
-  durationTime: 3
+  durationTime: 6
   exerciseImage: {fileID: 21300000, guid: 6aefc6e06189c5441a96ef46c51c7565, type: 3}
