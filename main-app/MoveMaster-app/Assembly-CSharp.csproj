@@ -58,6 +58,15 @@
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2022.3.50f1</UnityVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <UnityProjectGenerator>Package</UnityProjectGenerator>
+    <UnityProjectGeneratorVersion>2.0.22</UnityProjectGeneratorVersion>
+    <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
+    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
+    <UnityVersion>2022.3.50f1</UnityVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Analyzer Include="C:\Users\matis\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.0.4\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
@@ -65,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Exercise.cs" />
+    <Compile Include="Assets\Scripts\ComputerVisionServer\ComputerVisionServer.cs" />
+    <Compile Include="Assets\Scripts\WebcamImageCapture\FrameReceiver.cs" />
+    <Compile Include="Assets\Scripts\ComputerVisionServer\JointPosition.cs" />
     <Compile Include="Assets\Scripts\EventSidebar.cs" />
     <Compile Include="Assets\ScriptableObjects\WebcamImageCapture\FrameReceiver.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\b64ToImg.cs" />
