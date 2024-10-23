@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class Frame(BaseModel):
     image_base64: str
 
-class Settings(BaseModel):
+class Preset(BaseModel):
     threshold: float
     model: str
 
@@ -16,7 +16,7 @@ async def process_frame(frame: Frame):
     return {"message": "Image received"}
 
 @app.post("/settings")
-async def settings():
+async def settings(preset: Preset):
     return {"x": "y"}
 
 @app.post("/shutdown")
