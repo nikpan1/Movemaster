@@ -60,9 +60,10 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BaseServer.cs" />
     <Compile Include="Assets\Scripts\Exercise.cs" />
+    <Compile Include="Assets\Scripts\WebcamImageCapture\FrameReceiver.cs" />
     <Compile Include="Assets\Scripts\EventSidebar.cs" />
-    <Compile Include="Assets\ScriptableObjects\WebcamImageCapture\FrameReceiver.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\b64ToImg.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\imgToB64.cs" />
     <Compile Include="Assets\Scripts\RotablePlatform.cs" />

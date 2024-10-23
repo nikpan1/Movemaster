@@ -3,3 +3,5 @@
 main-app/MoveMaster-app/Temp/workerlic
 /cv-server/.idea
 *.pyc
+/main-app/MoveMaster-app/.vs
+/main-app/MoveMaster-app/.vs/MoveMaster-app/v17
