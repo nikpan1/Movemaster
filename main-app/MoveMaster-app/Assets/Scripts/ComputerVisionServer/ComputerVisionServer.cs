@@ -33,6 +33,7 @@ public class ComputerVisionServer : MonoBehaviour
     private void Start()
     {
         httpListenerSetup();
+        SendImageFrame(cat_image);
         listenerThread = new Thread(StartListener);
         listenerThread.Start();
     }
