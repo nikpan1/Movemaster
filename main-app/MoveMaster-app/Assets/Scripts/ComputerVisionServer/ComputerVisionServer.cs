@@ -11,14 +11,13 @@ public class ComputerVisionServer : MonoBehaviour
 {
     private HttpListener httpListener;
     private Thread listenerThread;
-    private bool isRunning = true;
 
 
     private byte[][] jointsArray;
 
 
-    private const string shutdownEndpoint = "/shutdown";
-    private const string unityServerURL = "http://localhost:5000";
+    private const string shutdownEndpoint = "/shutdown/";
+    private const string unityServerURL = "http://localhost:7000";
 
 
     private const float cvTreshold = 1.0f;
@@ -41,13 +40,12 @@ public class ComputerVisionServer : MonoBehaviour
     private void httpListenerSetup()
     {
         httpListener = new HttpListener();
-        httpListener.Prefixes.Add(unityServerURL + shutdownEndpoint + "/");
+        httpListener.Prefixes.Add(unityServerURL + shutdownEndpoint);
         httpListener.Start();
     }
 
     private void OnApplicationQuit()
     {
-        isRunning = false;
         SendShutdownSignal();
         if (httpListener != null && httpListener.IsListening)
         {
@@ -64,16 +62,16 @@ public class ComputerVisionServer : MonoBehaviour
     private void StartListener()
     {
         
-        while (isRunning)
+        while (httpListener != null && httpListener.IsListening)
         {
             try
             {
                 HttpListenerContext context = httpListener.GetContext();
                 ProcessRequest(context);
             }
-            catch (Exception e)
+            catch (Exception error)
             {
-                Debug.LogError("Server error HTTP: " + e.Message);
+                Debug.LogError("Server error HTTP: " + error.Message);
             }
         }
 
@@ -94,7 +92,7 @@ public class ComputerVisionServer : MonoBehaviour
     private void ClientShutdownSignal(HttpListenerResponse response)
     {
         Debug.Log("Close signal from Python");
-        isRunning = false;
+        httpListener.Stop();
         response.StatusCode = (int)HttpStatusCode.OK;
     }
 

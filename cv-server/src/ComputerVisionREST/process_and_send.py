@@ -1,9 +1,15 @@
 import uvicorn
 import json
+import httpx
+import os
+import signal
 from fastapi import FastAPI
 from pydantic import BaseModel
 from ..Base64.Base64Conversions import *
 from ..PoseEstimation.PoseEstimation import PoseLandmarkExtractor
+
+UNITY_SERVER_URL = "http://localhost:7000"
+UNITY_SHUTDOWN_ENDPOINT = "/shutdown/"
 
 pose_landmark_extractor = PoseLandmarkExtractor()
 class Frame(BaseModel):
@@ -32,9 +38,21 @@ async def settings(preset: Preset):
 
 @app.post("/shutdown")
 async def shutdown():
+    os.kill(os.getpid(), signal.SIGTERM)
     return {
         "Goodbye"
     }
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    async with httpx.AsyncClient() as client:
+        try:
+            unity_response = await client.post(
+                UNITY_SERVER_URL + UNITY_SHUTDOWN_ENDPOINT,
+                json = {"message": "Computer vision server is shutting down"}
+            )
+        except Exception as error:
+            print(f"Failed to send shutdown signal: {error}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
