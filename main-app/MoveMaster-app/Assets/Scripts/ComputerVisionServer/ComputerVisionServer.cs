@@ -12,7 +12,6 @@ public class ComputerVisionServer : MonoBehaviour
     private HttpListener httpListener;
     private Thread listenerThread;
     private bool isRunning = false;
-    private bool isCvServerRunning = false;
     private byte[][] jointsArray;
 
     private const int maxAttempts = 10;
@@ -96,7 +95,7 @@ public class ComputerVisionServer : MonoBehaviour
         }
         catch (Exception error)
         {
-            //Debug.LogError("Error notifying computer vision server about shutdown: " + error.Message);
+            Debug.LogError("Error notifying computer vision server about shutdown: " + error.Message);
         }
     }
 

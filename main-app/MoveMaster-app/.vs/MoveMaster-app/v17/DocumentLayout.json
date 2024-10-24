@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\kwjay\\Documents\\GitHub\\Movemaster\\main-app\\MoveMaster-app\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D22C4FCA-F120-803C-BCA8-3F90C7F4C950}|Assembly-CSharp.csproj|c:\\users\\kwjay\\documents\\github\\movemaster\\main-app\\movemaster-app\\assets\\scriptableobjects\\webcamimagecapture\\framereceiver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D22C4FCA-F120-803C-BCA8-3F90C7F4C950}|Assembly-CSharp.csproj|solutionrelative:assets\\scriptableobjects\\webcamimagecapture\\framereceiver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D22C4FCA-F120-803C-BCA8-3F90C7F4C950}|Assembly-CSharp.csproj|c:\\users\\kwjay\\documents\\github\\movemaster\\main-app\\movemaster-app\\assets\\scripts\\computervisionserver\\computervisionserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D22C4FCA-F120-803C-BCA8-3F90C7F4C950}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\computervisionserver\\computervisionserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "FrameReceiver.cs",
-              "DocumentMoniker": "C:\\Users\\kwjay\\Documents\\GitHub\\Movemaster\\main-app\\MoveMaster-app\\Assets\\ScriptableObjects\\WebcamImageCapture\\FrameReceiver.cs",
-              "RelativeDocumentMoniker": "Assets\\ScriptableObjects\\WebcamImageCapture\\FrameReceiver.cs",
-              "ToolTip": "C:\\Users\\kwjay\\Documents\\GitHub\\Movemaster\\main-app\\MoveMaster-app\\Assets\\ScriptableObjects\\WebcamImageCapture\\FrameReceiver.cs",
-              "RelativeToolTip": "Assets\\ScriptableObjects\\WebcamImageCapture\\FrameReceiver.cs",
-              "ViewState": "AgIAAGQAAAAAAAAAAAAcwIQAAAAmAAAAAAAAAA==",
+              "Title": "ComputerVisionServer.cs",
+              "DocumentMoniker": "C:\\Users\\kwjay\\Documents\\GitHub\\Movemaster\\main-app\\MoveMaster-app\\Assets\\Scripts\\ComputerVisionServer\\ComputerVisionServer.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ComputerVisionServer\\ComputerVisionServer.cs",
+              "ToolTip": "C:\\Users\\kwjay\\Documents\\GitHub\\Movemaster\\main-app\\MoveMaster-app\\Assets\\Scripts\\ComputerVisionServer\\ComputerVisionServer.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ComputerVisionServer\\ComputerVisionServer.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAowDMAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-23T15:04:31.911Z",
+              "WhenOpened": "2024-10-23T16:15:01.313Z",
               "EditorCaption": ""
             }
           ]
