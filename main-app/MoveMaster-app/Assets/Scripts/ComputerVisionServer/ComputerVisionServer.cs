@@ -11,9 +11,11 @@ public class ComputerVisionServer : MonoBehaviour
 {
     private HttpListener httpListener;
     private Thread listenerThread;
-
-
+    private bool isRunning = false;
+    private bool isCvServerRunning = false;
     private byte[][] jointsArray;
+
+    private const int maxAttempts = 10;
 
 
     private const string shutdownEndpoint = "/shutdown/";
@@ -32,7 +34,7 @@ public class ComputerVisionServer : MonoBehaviour
     private void Start()
     {
         httpListenerSetup();
-        SendImageFrame(cat_image);
+        isRunning = true;
         listenerThread = new Thread(StartListener);
         listenerThread.Start();
     }
@@ -44,39 +46,67 @@ public class ComputerVisionServer : MonoBehaviour
         httpListener.Start();
     }
 
-    private void OnApplicationQuit()
-    {
-        SendShutdownSignal();
-        if (httpListener != null && httpListener.IsListening)
-        {
-            httpListener.Stop();
-        }
-
-        if (listenerThread != null && listenerThread.IsAlive)
-        {
-            listenerThread.Abort();
-        }
-
-    }
-
     private void StartListener()
     {
-        
-        while (httpListener != null && httpListener.IsListening)
+        while (isRunning)
         {
             try
             {
                 HttpListenerContext context = httpListener.GetContext();
                 ProcessRequest(context);
             }
+            catch (HttpListenerException)
+            {
+                Debug.LogError("HttpListener has encountered an exception");
+                break;
+            }
             catch (Exception error)
             {
                 Debug.LogError("Server error HTTP: " + error.Message);
             }
         }
-
-        httpListener.Close();
     }
+
+    private void StopListener()
+    {
+        isRunning = false;
+        if (httpListener != null && httpListener.IsListening)
+        {
+            httpListener.Stop();
+        }
+        if (listenerThread != null && listenerThread.IsAlive)
+        {
+            listenerThread.Join();
+            Debug.Log("Server was stopped correctly");
+        }
+    }
+    private void SendShutdownSignal()
+    {
+        var shutdownRequest = (HttpWebRequest)WebRequest.Create(computerVisionServerURL + cvShutdownEndpoint);
+        shutdownRequest.Method = "POST";
+        try
+        {
+            using (var response = (HttpWebResponse)shutdownRequest.GetResponse())
+            {
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Debug.Log("Computer vision server notified of Unity Server shutdown.");
+                }
+            }
+        }
+        catch (Exception error)
+        {
+            //Debug.LogError("Error notifying computer vision server about shutdown: " + error.Message);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SendShutdownSignal();
+        StopListener();
+    }
+
+
 
     private void ProcessRequest(HttpListenerContext context)
     {
@@ -91,9 +121,11 @@ public class ComputerVisionServer : MonoBehaviour
 
     private void ClientShutdownSignal(HttpListenerResponse response)
     {
-        Debug.Log("Close signal from Python");
-        httpListener.Stop();
+        Debug.Log("Shutdown signal from computer vision server");
+        StopListener();
         response.StatusCode = (int)HttpStatusCode.OK;
+        response.OutputStream.Close();
+        Debug.Log("Server is shutting down...");
     }
 
     private void SendImageFrame(string imageBase64)
@@ -121,9 +153,9 @@ public class ComputerVisionServer : MonoBehaviour
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception error)
         {
-            Debug.LogError("Error from computer vision server: " + e.Message);
+            Debug.LogError("Error from computer vision server: " + error.Message);
         }
     }
 
@@ -152,29 +184,13 @@ public class ComputerVisionServer : MonoBehaviour
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception error)
         {
-            Debug.LogError("Error from computer vision server: " + e.Message);
+            Debug.LogError("Error from computer vision server: " + error.Message);
         }
     }
 
-    private void SendShutdownSignal()
-    {
-        var shutdownRequest = (HttpWebRequest)WebRequest.Create(computerVisionServerURL + cvShutdownEndpoint);
-        shutdownRequest.Method = "POST";
-        try
-        {
-            using (var response = (HttpWebResponse)shutdownRequest.GetResponse())
-            {
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    Debug.Log("Computer vision server notified of Unity Server shutdown.");
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error notifying computer vision server about shutdown: " + e.Message);
-        }
-    }
+
+
+
 }

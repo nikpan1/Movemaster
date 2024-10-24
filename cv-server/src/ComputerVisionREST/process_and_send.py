@@ -39,9 +39,7 @@ async def settings(preset: Preset):
 @app.post("/shutdown")
 async def shutdown():
     os.kill(os.getpid(), signal.SIGTERM)
-    return {
-        "Goodbye"
-    }
+    return FastAPI.Response(status_code=200)
 
 @app.on_event("shutdown")
 async def shutdown_event():
