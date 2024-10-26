@@ -16,7 +16,7 @@ public class ComputerVisionServer : MonoBehaviour
     private Thread listenerThread;
     private bool isRunning = false;
     private bool isCVSRunning = false;
-    private byte[][] jointsArray;
+    private JointPosition[32] joints;
 
     private const int maxAttempts = 10;
     private static readonly HttpClient client = new HttpClient();
