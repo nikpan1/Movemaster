@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\EventSidebar.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\b64ToImg.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\imgToB64.cs" />
+    <Compile Include="Assets\Scripts\ComputerVisionServer\JointsPositions.cs" />
     <Compile Include="Assets\Scripts\RotablePlatform.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -38,19 +38,15 @@ public class ComputerVisionServer : MonoBehaviour
     {
         httpListenerSetup();
         isRunning = true;
+        listenerThread = new Thread(StartListener);
+        listenerThread.Start();
         isCVSRunning = await CheckServerStatus();
-        if (isCVSRunning)
-        {
-            listenerThread = new Thread(StartListener);
-            listenerThread.Start();
-        }
     }
 
     private async Task<bool> CheckServerStatus()
     {
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            
             try
             {
                 HttpResponseMessage statusResponse = await client.GetAsync(computerVisionServerURL + cvHealthCheckEndpoint);
