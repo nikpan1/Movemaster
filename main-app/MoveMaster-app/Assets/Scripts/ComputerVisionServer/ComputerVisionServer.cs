@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
-using JointPosition;
+using CVServer.Models;
 public class ComputerVisionServer : MonoBehaviour
 {
     private HttpListener httpListener;
