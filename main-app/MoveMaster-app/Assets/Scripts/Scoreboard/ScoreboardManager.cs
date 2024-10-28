@@ -6,38 +6,34 @@ using UnityEngine;
 public class ScoreboardManager : MonoBehaviour
 {
     public static ScoreboardManager Instance;
-    [SerializeField]
-    private TMP_Text scorePoints;
-    [SerializeField]
-    private int score=0;
+    private TMP_Text _scorePoints;
+    private int _score=0;
 
-    void Awake(){
-        if (Instance != null && Instance != this) 
-    { 
-        Destroy(this); 
-    } 
-    else 
-    { 
-        Instance = this; 
-    } 
+    private void Awake(){
+        if (Instance != null && Instance != this) { 
+            Destroy(this); 
+        } 
+        else { 
+            Instance = this; 
+        } 
     }
 
-    void Start()
+    private void Start()
     {
-        setScore(0);
+        SetScore(0);
     }
 
-    public void setScore(int newScore){
-        score = newScore;
-        scorePoints.SetText(newScore.ToString());
+    public void SetScore(int newScore){
+        _score = newScore;
+        _scorePoints.SetText(newScore.ToString());
     }
 
-    public int getScore(){
-        return score;
+    public int GetScore(){
+        return _score;
     }
 
-    public void addValue(int value){
-        int newScore = score + value;
-        setScore(newScore);
+    public void AddValue(int value){
+        int newScore = _score + value;
+        SetScore(newScore);
     }
 }
