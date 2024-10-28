@@ -1,89 +1,60 @@
+import uvicorn
+import json
+import httpx
+import os
+import signal
 import cv2
-import requests
-import numpy as np
-import time
-import threading
-from flask import Flask, request
+from fastapi import FastAPI
+from pydantic import BaseModel
+from ..Base64.Base64Conversions import *
 
-app = Flask(__name__)
+UNITY_SERVER_URL = "http://localhost:7000"
+UNITY_SHUTDOWN_ENDPOINT = "/shutdown/"
+IS_UNITY_RUNNING = False
 
-UNITY_SERVER_URL = "http://localhost:5000/send_frame"
-UNITY_SHUTDOWN_URL = "http://localhost:5000/shutdown"
+app = FastAPI()
 
-is_running = True
-unity_is_active = False
+class Frame(BaseModel):
+    image_base64: str
 
-@app.route('/unity_shutdown', methods=['POST'])
-def unity_shutdown():
-    global unity_is_active
-    print("Unity has stopped.")
-    unity_is_active = False
-    return '', 200
+@app.get("/health")
+async def health_check():
+    global IS_UNITY_RUNNING
+    IS_UNITY_RUNNING = True
+    return {
+        "status": "OK"
+    }
 
-def start_flask_server():
-    app.run(port=5001)
-
-def check_unity_status():
-    global unity_is_active
-    while not unity_is_active:
-        try:
-
-            response = requests.get(UNITY_SERVER_URL, timeout=1)
-            if response.status_code == 200:
-                unity_is_active = True
-                print("Unity is running, starting to send frames.")
-        except requests.exceptions.RequestException:
-            print("Waiting for Unity to start...")
-            time.sleep(2)
-
-def capture_and_send_frames():
-    global is_running, unity_is_active
+@app.post("/capture_and_send")
+async def capture_and_send():
     cap = cv2.VideoCapture(0)
-
-    if not cap.isOpened():
-        print("Could not open camera")
-        return
-
-    try:
-        check_unity_status()
-
-        while is_running and unity_is_active:
-            ret, frame = cap.read()
-
-            if not ret:
-                print("Failed to capture frame")
-                break
-
-            _, encoded_image = cv2.imencode('.jpg', frame)
-            image_data = encoded_image.tobytes()
-
-            try:
-                response = requests.post(UNITY_SERVER_URL, data=image_data, headers={'Content-Type': 'application/octet-stream'})
-                if response.status_code == 200:
-                    print("The frame sent")
-                else:
-                    print(f"Unity error: {response.status_code}")
-            except requests.exceptions.RequestException as e:
-                print(f"Error connecting to Unity: {e}")
-                break
-
-            time.sleep(0.1)
-
-    finally:
+    ret, frame = cap.read()
+    if not ret:
         cap.release()
-        cv2.destroyAllWindows()
+        raise Exception("Failed to capture frame")
+    
+    image_base64 = image_to_base64(frame).decode('utf-8')
+    cap.release()
+    
+    return image_base64
 
-        if unity_is_active:
+
+@app.post("/shutdown")
+async def shutdown():
+    os.kill(os.getpid(), signal.SIGTERM)
+    return {"message": "Server shutting down"}
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if IS_UNITY_RUNNING:
+        async with httpx.AsyncClient() as client:
             try:
-                requests.post(UNITY_SHUTDOWN_URL)
-                print("Python is closed")
-            except requests.exceptions.RequestException as e:
-                print(f"Error connecting to Unity (shutdown): {e}")
+                await client.post(
+                    UNITY_SERVER_URL + UNITY_SHUTDOWN_ENDPOINT,
+                    json={"message": "Camera capture server is shutting down"}
+                )
+            except Exception as error:
+                print(f"Failed to send shutdown signal: {error}")
 
 if __name__ == "__main__":
-
-    flask_thread = threading.Thread(target=start_flask_server)
-    flask_thread.daemon = True  
-    flask_thread.start()
-
-    capture_and_send_frames()
+    uvicorn.run(app, host="127.0.0.1", port=8001)
