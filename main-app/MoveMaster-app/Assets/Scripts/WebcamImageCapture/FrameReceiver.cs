@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 
 
@@ -14,10 +15,8 @@ public class FrameReceiver : MonoBehaviour
     private static readonly HttpClient client = new HttpClient();
     private Thread listenerThread;
 
-    private Sprite latestFrame;
-    private string base64Frame;
-    public Sprite LatestFrame => latestFrame;
-    public string Base64Frame => base64Frame;
+    private Sprite _latestFrame;
+    private string _base64Frame;
 
     private bool isRunning = false;
     private bool isCCSRunning = false;
@@ -39,20 +38,26 @@ public class FrameReceiver : MonoBehaviour
         isRunning = true;
         _ = StartListener();
         isCCSRunning = await CheckServerStatus(captureCameraServerURL, healthCheckEndpoint, ccName);
-
         if (isCCSRunning)
         {
-            while (isRunning)
-            {
-                await StartImageCapture();
-            }
+            StartCoroutine(ContinuousCapture());
         }
         else
         {
             Debug.LogError($"{ccName}: Server is not running. Unable to start continuous capture.");
         }
     }
-    
+
+    private IEnumerator ContinuousCapture()
+    {
+        while (isRunning)
+        {
+            _ = StartImageCapture();
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield break;
+    }
+
     private async void OnApplicationQuit()
     {
         if (isCCSRunning)
@@ -163,19 +168,19 @@ public class FrameReceiver : MonoBehaviour
                 {
                     using (var streamReader = new StreamReader(response.GetResponseStream()))
                     {
-                        base64Frame = await streamReader.ReadToEndAsync();
-                        base64Frame = base64Frame.Substring(1, base64Frame.Length - 2);
+                        Base64Frame = await streamReader.ReadToEndAsync();
+                        Base64Frame = Base64Frame.Substring(1, Base64Frame.Length - 2);
                         Debug.Log($"{ccName}: Capture initiated successfully and image received.");
 
-                        byte[] imageBytes = Convert.FromBase64String(base64Frame);
+                        byte[] imageBytes = Convert.FromBase64String(Base64Frame);
                         Texture2D texture = new Texture2D(2, 2);
                         texture.LoadImage(imageBytes);
-                        latestFrame = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                        Debug.Log($"Base64Frame content: {base64Frame.Substring(0, Mathf.Min(50, base64Frame.Length))}...");
+                        LatestFrame = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                        Debug.Log($"Base64Frame content: {Base64Frame.Substring(0, Mathf.Min(50, Base64Frame.Length))}...");
 
-                        if (latestFrame != null)
+                        if (LatestFrame != null)
                         {
-                            Debug.Log($"LatestFrame resolution: {latestFrame.texture.width}x{latestFrame.texture.height}");
+                            Debug.Log($"LatestFrame resolution: {LatestFrame.texture.width}x{LatestFrame.texture.height}");
                         }
                         else
                         {
@@ -195,4 +200,15 @@ public class FrameReceiver : MonoBehaviour
         }
     }
 
+    public Sprite LatestFrame
+    {
+        get { return _latestFrame; }
+        private set { _latestFrame = value; }
+    }
+
+    public string Base64Frame
+    {
+        get { return _base64Frame; }
+        private set { _base64Frame = value; }
+    }
 }
