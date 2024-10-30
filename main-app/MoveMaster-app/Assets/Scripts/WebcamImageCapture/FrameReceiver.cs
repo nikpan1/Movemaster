@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,8 +14,13 @@ public class FrameReceiver : MonoBehaviour
     private static readonly HttpClient client = new HttpClient();
     private Thread listenerThread;
 
-    private bool isRunning = true;
-    private bool isCvAndCcRunning = false;
+    private Sprite latestFrame;
+    private string base64Frame;
+    public Sprite LatestFrame => latestFrame;
+    public string Base64Frame => base64Frame;
+
+    private bool isRunning = false;
+    private bool isCCSRunning = false;
 
     private const string shutdownEndpoint = "/shutdown/";
     private const string unityServerURL = "http://localhost:7000";
@@ -23,32 +29,36 @@ public class FrameReceiver : MonoBehaviour
 
     private const string pShutdownEndpoint = "/shutdown";
     private const string healthCheckEndpoint = "/health";
-    private const string cvProcessEndpoint = "/process";
     private const string ccCaptureEndpoint = "/capture_and_send";
-    private const string cvSettingsEndpoint = "/settings";
-    private const string computerVisionServerURL = "http://localhost:8000";
     private const string captureCameraServerURL = "http://localhost:8001";
     private const string ccName = "Capture Camera Server";
 
     private async void Start()
     {
-        HttpListenerSetup(); 
-        listenerThread = new Thread(StartListener);
-        listenerThread.Start();
-        isCvAndCcRunning = await CheckBothServerStatuses();
+        HttpListenerSetup();
+        isRunning = true;
+        _ = StartListener();
+        isCCSRunning = await CheckServerStatus(captureCameraServerURL, healthCheckEndpoint, ccName);
 
-        if (isCvAndCcRunning)
+        if (isCCSRunning)
         {
-            for (int i = 0; i < 10; i++)
+            while (isRunning)
             {
-                SendImageFrame();
+                await StartImageCapture();
             }
+        }
+        else
+        {
+            Debug.LogError($"{ccName}: Server is not running. Unable to start continuous capture.");
         }
     }
     
-    private void OnApplicationQuit()
+    private async void OnApplicationQuit()
     {
-        SendShutdownSignal(captureCameraServerURL, pShutdownEndpoint, ccName);
+        if (isCCSRunning)
+        {
+            await SendShutdownSignal();
+        }
         StopListener();
     }
 
@@ -56,83 +66,48 @@ public class FrameReceiver : MonoBehaviour
     {
         httpListener = new HttpListener();
         httpListener.Prefixes.Add(unityServerURL + shutdownEndpoint);
-        httpListener.Start();
     }
 
-
-    private async Task<bool> CheckBothServerStatuses()
-    { 
-        bool isComputerVisionServerRunning = false;
-        bool isCaptureServerRunning = false;
-
+    private async Task<bool> CheckServerStatus(string serverUrl, string healthEndpoint, string serverName)
+    {
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            Task<bool> ccStatusTask = CheckServerStatus(captureCameraServerURL, healthCheckEndpoint, ccName);
-
             try
             {
-                bool[] results = await Task.WhenAll(cvStatusTask, ccStatusTask);
-                isComputerVisionServerRunning = results[0];
-                isCaptureServerRunning = results[1];
-
-                if (isComputerVisionServerRunning && isCaptureServerRunning)
+                HttpResponseMessage statusResponse = await client.GetAsync(serverUrl + healthEndpoint);
+                if (statusResponse.IsSuccessStatusCode)
                 {
-                    Debug.Log("Both servers are running.");
+                    Debug.Log($"{serverName}: Server is running.");
                     return true;
                 }
             }
             catch (Exception error)
             {
-                Debug.LogError($"Error while checking server statuses: {error.Message}");
+                Debug.LogError($"{serverName}: Check failed - {error.Message}");
             }
-
             await Task.Delay(TimeSpan.FromSeconds(retryDelay));
-            Debug.LogWarning($"Attempt {attempt + 1} to check server statuses failed.");
-        }
-
-        if (!isCaptureServerRunning)
-        {
-            Debug.LogError($"{ccName} is not responding after {maxAttempts} attempts.");
         }
         return false;
     }
 
-    private async Task<bool> CheckServerStatus(string serverUrl, string healthEndpoint, string serverName)
+    private async Task StartListener()
     {
+        httpListener.Start();
         try
         {
-            HttpResponseMessage statusResponse = await client.GetAsync(serverUrl + healthEndpoint);
-            if (statusResponse.IsSuccessStatusCode)
+            while (isRunning && httpListener.IsListening)
             {
-                Debug.Log($"{serverName}: Server is running.");
-                return true;
-            }
-        }
-        catch (Exception error)
-        {
-            Debug.LogError($"{serverName}: Check failed - {error.Message}");
-        }
-        return false;
-    }
-
-    private void StartListener()
-    {
-        while (isRunning)
-        {
-            try
-            {
-                HttpListenerContext context = httpListener.GetContext();
+                HttpListenerContext context = await httpListener.GetContextAsync();
                 ProcessRequest(context);
             }
-            catch (HttpListenerException)
-            {
-                Debug.LogError("HttpListener has encountered an exception");
-                break;
-            }
-            catch (Exception error)
-            {
-                Debug.LogError("Server error HTTP: " + error.Message);
-            }
+        }
+        catch (HttpListenerException ex) when (ex.ErrorCode == 995)
+        {
+            Debug.Log("Listener has been closed gracefully.");
+        }
+        finally
+        {
+            httpListener.Close();
         }
     }
 
@@ -142,11 +117,6 @@ public class FrameReceiver : MonoBehaviour
         if (httpListener != null && httpListener.IsListening)
         {
             httpListener.Stop();
-        }
-        if (listenerThread != null && listenerThread.IsAlive)
-        {
-            listenerThread.Join();
-            Debug.Log("Server was stopped correctly");
         }
     }
 
@@ -161,36 +131,26 @@ public class FrameReceiver : MonoBehaviour
         response.Close();
     }
 
-    private void SendShutdownSignal(string serverUrl, string shutdownEndpoint, string serverName)
+    private async Task SendShutdownSignal()
     {
-        var shutdownRequest = (HttpWebRequest)WebRequest.Create(serverUrl + shutdownEndpoint);
-        shutdownRequest.Method = "POST";
-        try
+        using (StringContent content = new StringContent("Unity server is shutting down", Encoding.UTF8, "application/json"))
         {
-            using (var response = (HttpWebResponse)shutdownRequest.GetResponse())
-            {
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    Debug.Log($"{serverName}: Server notified of shutdown.");
-                }
-            }
-        }
-        catch (Exception error)
-        {
-            Debug.LogError($"{serverName}: Error notifying server about shutdown - {error.Message}");
+            HttpResponseMessage shutdownResponse = await client.PostAsync(captureCameraServerURL + pShutdownEndpoint, content);
+            shutdownResponse.EnsureSuccessStatusCode();
         }
     }
 
     private void ClientShutdownSignal(HttpListenerResponse response, string serverName)
     {
         Debug.Log($"{serverName}: Shutdown signal received.");
+        isCCSRunning = false;
         StopListener();
         response.StatusCode = (int)HttpStatusCode.OK;
         response.OutputStream.Close();
         Debug.Log($"{serverName}: Server is shutting down...");
     }
 
-    private async Task<string> StartImageCapture()
+    private async Task StartImageCapture()
     {
         var request = (HttpWebRequest)WebRequest.Create(captureCameraServerURL + ccCaptureEndpoint);
         request.Method = "POST";
@@ -203,10 +163,24 @@ public class FrameReceiver : MonoBehaviour
                 {
                     using (var streamReader = new StreamReader(response.GetResponseStream()))
                     {
-                        string imageBase64 = await streamReader.ReadToEndAsync();
-                        imageBase64 = imageBase64.Substring(1, imageBase64.Length - 2);
+                        base64Frame = await streamReader.ReadToEndAsync();
+                        base64Frame = base64Frame.Substring(1, base64Frame.Length - 2);
                         Debug.Log($"{ccName}: Capture initiated successfully and image received.");
-                        return imageBase64;
+
+                        byte[] imageBytes = Convert.FromBase64String(base64Frame);
+                        Texture2D texture = new Texture2D(2, 2);
+                        texture.LoadImage(imageBytes);
+                        latestFrame = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                        Debug.Log($"Base64Frame content: {base64Frame.Substring(0, Mathf.Min(50, base64Frame.Length))}...");
+
+                        if (latestFrame != null)
+                        {
+                            Debug.Log($"LatestFrame resolution: {latestFrame.texture.width}x{latestFrame.texture.height}");
+                        }
+                        else
+                        {
+                            Debug.Log("LatestFrame is null.");
+                        }
                     }
                 }
                 else
@@ -219,8 +193,6 @@ public class FrameReceiver : MonoBehaviour
         {
             Debug.LogError($"{ccName}: Error starting image capture - {error.Message}");
         }
-
-        return null;
     }
 
 }
