@@ -65,9 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Exercise.cs" />
+    <Compile Include="Assets\Scripts\SettingsMenu\SettingsPanel.cs" />
     <Compile Include="Assets\Scripts\EventSidebar.cs" />
     <Compile Include="Assets\ScriptableObjects\WebcamImageCapture\FrameReceiver.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\b64ToImg.cs" />
+    <Compile Include="Assets\Scripts\SettingsMenu\ScreenMode.cs" />
+    <Compile Include="Assets\Scripts\SettingsMenu\SettingsMenu.cs" />
     <Compile Include="Assets\Scripts\Scoreboard\ScoreboardManager.cs" />
     <Compile Include="Assets\Scripts\Base64Conversions\imgToB64.cs" />
     <Compile Include="Assets\Scripts\RotablePlatform.cs" />
