@@ -12,56 +12,66 @@ from tkinter import filedialog
 from tkinter import font as tkFont
 
 
-class MockerUI(tk.Tk):
+class MockerWB(tk.Tk):
     def __init__(self, *args, **kwargs) -> None:
         tk.Tk.__init__(self, *args, **kwargs)
         self.video_capture = VideoCapture()
         self.gui_setup()
         self.delay = 10
         self.playing = False
+        self.webcam = False
         self.update()
 
     def gui_setup(self):
         self.wm_title("Webcam Mocker")
         self.configure(background="#333333")
-        self.left_frame = tk.Frame(self, width=200, height=200, bg='grey')
-        self.left_frame.grid(row=1, column=0, padx=5, pady=5)
 
-        self.right_frame = tk.Frame(self, width=400, height=200, bg='grey')
-        self.right_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.top_frame = tk.Frame(self, width=600, height=200, bg='grey')
+        self.top_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.bottom_frame = tk.Frame(self, width=200, height=200, bg='grey')
+        self.bottom_frame.grid(row=1, column=0, padx=5, pady=5)
+
         helv36 = tkFont.Font(family='Helvetica', size=16, weight=tkFont.BOLD)
+        self.toggle_webcam_btn = tk.Button(
+            self.bottom_frame,
+            text = 'WEBCAM',
+            command = self.toggle_webcam,
+            font = helv36,
+            background = '#7E7E7E'
+        )
         self.open_file_btn = tk.Button(
-            self.left_frame,
+            self.bottom_frame,
             text = 'OPEN',
             command = self.select_file,
             font = helv36
         )
         self.play_btn = tk.Button(
-            self.left_frame,
+            self.bottom_frame,
             text = 'PLAY',
             command = self.play_video,
             font = helv36
         )
         self.stop_btn = tk.Button(
-            self.left_frame,
+            self.bottom_frame,
             text = 'STOP',
             command = self.stop_video,
             font = helv36
         )
         self.replay_btn = tk.Button(
-            self.left_frame,
+            self.bottom_frame,
             text = 'REPLAY',
             command = self.replay_video,
             font = helv36
         )
         self.video_canvas = tk.Canvas(
-            self.right_frame,
+            self.top_frame,
         )
-        self.video_canvas.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
-        self.open_file_btn.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
-        self.replay_btn.grid(row=0, column=1, padx=5, pady=5, ipadx=10)
-        self.play_btn.grid(row=0, column=2, padx=5, pady=5, ipadx=10)
-        self.stop_btn.grid(row=0, column=3, padx=5, pady=5, ipadx=10)
+        self.video_canvas.grid(row=0, column=0)
+        self.toggle_webcam_btn.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
+        self.open_file_btn.grid(row=0, column=1, padx=5, pady=5, ipadx=10)
+        self.replay_btn.grid(row=0, column=2, padx=5, pady=5, ipadx=10)
+        self.play_btn.grid(row=0, column=3, padx=5, pady=5, ipadx=10)
+        self.stop_btn.grid(row=0, column=4, padx=5, pady=5, ipadx=10)
 
 
     def update(self):
@@ -73,6 +83,26 @@ class MockerUI(tk.Tk):
             else:
                 self.playing = False
         self.after(self.delay, self.update)
+
+    def toggle_webcam(self):
+        if self.webcam:
+            self.toggle_webcam_btn.config(background = "#7E7E7E")
+            self.replay_btn["state"] = "normal"
+            self.open_file_btn["state"] = "normal"
+            self.play_btn["state"] = "normal"
+            self.stop_btn["state"] = "normal"
+            self.video_capture.reset()
+            self.webcam = False
+        else:
+            self.toggle_webcam_btn.config(background = "red")
+            self.replay_btn["state"] = "disabled"
+            self.open_file_btn["state"] = "disabled"
+            self.play_btn["state"] = "disabled"
+            self.stop_btn["state"] = "disabled"
+            self.video_capture.set(0)
+            self.resize_video_canvas()
+            self.playing = True
+            self.webcam = True
 
     def play_video(self):
         if self.video_capture.video != None:
@@ -123,6 +153,9 @@ class VideoCapture():
         self.height = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.current = path
 
+    def reset(self):
+        self.video = None
+
     def get_frame(self):
         if self.video != None and self.video.isOpened():
             ret, frame = self.video.read()
@@ -137,5 +170,5 @@ class VideoCapture():
         if self.video != None and self.video.isOpened():
             self.video.release()
 
-mockerUI = MockerUI()
-mockerUI.mainloop()
+mocker_webcam = MockerWB()
+mocker_webcam.mainloop()
