@@ -9,6 +9,7 @@ import cv2
 import tkinter as tk
 import PIL.Image, PIL.ImageTk
 from tkinter import filedialog
+from tkinter import font as tkFont
 
 
 class MockerUI(tk.Tk):
@@ -17,48 +18,74 @@ class MockerUI(tk.Tk):
         self.video_capture = VideoCapture()
         self.gui_setup()
         self.delay = 10
+        self.playing = False
         self.update()
 
     def gui_setup(self):
         self.wm_title("Webcam Mocker")
+        self.configure(background="#333333")
+        self.left_frame = tk.Frame(self, width=200, height=200, bg='grey')
+        self.left_frame.grid(row=1, column=0, padx=5, pady=5)
+
+        self.right_frame = tk.Frame(self, width=400, height=200, bg='grey')
+        self.right_frame.grid(row=0, column=0, padx=5, pady=5)
+        helv36 = tkFont.Font(family='Helvetica', size=16, weight=tkFont.BOLD)
         self.open_file_btn = tk.Button(
-            self,
-            text = 'Open a video file',
-            command = self.select_file
+            self.left_frame,
+            text = 'OPEN',
+            command = self.select_file,
+            font = helv36
         )
-        self.start_btn = tk.Button(
-            self,
-            text = 'START',
-            command = None,
+        self.play_btn = tk.Button(
+            self.left_frame,
+            text = 'PLAY',
+            command = self.play_video,
+            font = helv36
         )
         self.stop_btn = tk.Button(
-            self,
+            self.left_frame,
             text = 'STOP',
-            command = None,
+            command = self.stop_video,
+            font = helv36
         )
         self.replay_btn = tk.Button(
-            self,
+            self.left_frame,
             text = 'REPLAY',
             command = self.replay_video,
+            font = helv36
         )
         self.video_canvas = tk.Canvas(
-            self
+            self.right_frame,
         )
-        self.video_canvas.pack()
-        self.open_file_btn.pack()
-        self.replay_btn.pack()
+        self.video_canvas.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
+        self.open_file_btn.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
+        self.replay_btn.grid(row=0, column=1, padx=5, pady=5, ipadx=10)
+        self.play_btn.grid(row=0, column=2, padx=5, pady=5, ipadx=10)
+        self.stop_btn.grid(row=0, column=3, padx=5, pady=5, ipadx=10)
 
 
     def update(self):
-        if self.video_capture.video != None:
+        if self.video_capture.video != None and self.playing:
             ret, frame = self.video_capture.get_frame()
             if ret:
                 self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
                 self.video_canvas.create_image(0,0, image = self.photo, anchor = tk.NW)
+            else:
+                self.playing = False
         self.after(self.delay, self.update)
 
+    def play_video(self):
+        if self.video_capture.video != None:
+            self.playing = True
+    
+    def stop_video(self):
+        if self.video_capture.video != None:
+            self.playing = False
+
     def replay_video(self):
-        self.video_capture.set(self.video_capture.current)
+        if self.video_capture.video != None:
+            self.playing = True
+            self.video_capture.set(self.video_capture.current)
 
     def select_file(self):
         filename = filedialog.askopenfile(
@@ -69,12 +96,14 @@ class MockerUI(tk.Tk):
         if filename != None:
             self.video_capture.set(filename.name)
             self.resize_video_canvas()
+            self.playing = False
             filename.close()
 
     def resize_video_canvas(self):
         self.video_canvas.config(
             width = self.video_capture.width,
-            height = self.video_capture.height
+            height = self.video_capture.height,
+            background = "black"
         )
 
 class VideoCapture():
