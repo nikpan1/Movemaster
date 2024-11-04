@@ -8,6 +8,8 @@ from src.Base64.Base64Conversions import *
 import cv2
 import tkinter as tk
 import PIL.Image, PIL.ImageTk
+import threading
+from src.MockerWebcamREST.catbase64 import cat_base64
 from tkinter import filedialog
 from tkinter import font as tkFont
 
@@ -21,7 +23,12 @@ class MockerWB(tk.Tk):
         self.playing = False
         self.webcam = False
         self.current_frame = None
+        self.ret = False
+        self.server = MockerCaptureCameraServer(self)
+        self.server_thread = threading.Thread(target=self.server.start_server,daemon=True)
+        self.server_thread.start()
         self.update()
+        
 
     def gui_setup(self):
         self.wm_title("Webcam Mocker")
@@ -78,7 +85,8 @@ class MockerWB(tk.Tk):
     def update(self):
         if self.video_capture.video != None and self.playing:
             ret, frame = self.video_capture.get_frame()
-            if ret:
+            self.ret = ret
+            if self.ret:
                 self.current_frame = frame
                 self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
                 self.video_canvas.create_image(0,0, image = self.photo, anchor = tk.NW)
@@ -177,17 +185,16 @@ class Frame(BaseModel):
     image_base64: str
 
 class MockerCaptureCameraServer:
-    def __init__(self) -> None:
+    def __init__(self, mocker) -> None:
         self.UNITY_SERVER_URL = "http://localhost:7000"
         self.UNITY_SHUTDOWN_ENDPOINT = "/shutdown/"
         self.IS_UNITY_RUNNING = False
         self.app = FastAPI()
-        self.mocker = MockerWB()
+        self.mocker = mocker
 
 
     def start_server(self) -> None:
         self.setup_calls()
-        self.mocker.mainloop()
         uvicorn.run(self.app, host="127.0.0.1", port=8001)
 
     def shutdown_server(self) -> None:
@@ -203,11 +210,13 @@ class MockerCaptureCameraServer:
 
         @self.app.post("/capture_and_send")
         async def capture_and_send():
-            frame = self.mocker.current_frame
-            if frame == None:
-                raise Exception("Failed to capture frame")
-            image_base64 = image_to_base64(self.mocker.current_frame).decode('utf-8')
-            return image_base64
+            frame = mocker.current_frame
+            if mocker.ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                image_base64 = image_to_base64(frame).decode('utf-8')
+                return image_base64
+            else:
+                return cat_base64
 
         @self.app.post("/shutdown")
         async def shutdown():
@@ -228,6 +237,5 @@ class MockerCaptureCameraServer:
                         print(f"Failed to send shutdown signal: {error}")
 
 
-if __name__ == "__main__":
-    webcamImageServer = MockerCaptureCameraServer()
-    webcamImageServer.start_server()
+mocker = MockerWB()
+mocker.mainloop()
