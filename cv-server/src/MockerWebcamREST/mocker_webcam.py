@@ -2,7 +2,7 @@ import uvicorn
 import httpx
 import os
 import signal
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI
 from pydantic import BaseModel
 from src.Base64.Base64Conversions import *
 import cv2
@@ -18,6 +18,7 @@ class MockerWB(tk.Tk):
     def __init__(self, *args, **kwargs) -> None:
         tk.Tk.__init__(self, *args, **kwargs)
         self.video_capture = VideoCapture()
+        self.playback_resolution = (640, 480)
         self.gui_setup()
         self.delay = 10
         self.playing = False
@@ -25,7 +26,7 @@ class MockerWB(tk.Tk):
         self.current_frame = None
         self.ret = False
         self.server = MockerCaptureCameraServer(self)
-        self.server_thread = threading.Thread(target=self.server.start_server,daemon=True)
+        self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
         self.server_thread.start()
         self.update()
         
@@ -34,7 +35,7 @@ class MockerWB(tk.Tk):
         self.wm_title("Webcam Mocker")
         self.configure(background="#333333")
 
-        self.top_frame = tk.Frame(self, width=600, height=200, bg='grey')
+        self.top_frame = tk.Frame(self, width=200, height=200, bg='grey')
         self.top_frame.grid(row=0, column=0, padx=5, pady=5)
         self.bottom_frame = tk.Frame(self, width=200, height=200, bg='grey')
         self.bottom_frame.grid(row=1, column=0, padx=5, pady=5)
@@ -42,37 +43,40 @@ class MockerWB(tk.Tk):
         helv36 = tkFont.Font(family='Helvetica', size=16, weight=tkFont.BOLD)
         self.toggle_webcam_btn = tk.Button(
             self.bottom_frame,
-            text = 'WEBCAM',
-            command = self.toggle_webcam,
-            font = helv36,
-            background = '#7E7E7E'
+            text='WEBCAM',
+            command=self.toggle_webcam,
+            font=helv36,
+            background='#7E7E7E'
         )
         self.open_file_btn = tk.Button(
             self.bottom_frame,
-            text = 'OPEN',
-            command = self.select_file,
-            font = helv36
+            text='OPEN',
+            command=self.select_file,
+            font=helv36
         )
         self.play_btn = tk.Button(
             self.bottom_frame,
-            text = 'PLAY',
-            command = self.play_video,
-            font = helv36
+            text='PLAY',
+            command=self.play_video,
+            font=helv36
         )
         self.stop_btn = tk.Button(
             self.bottom_frame,
-            text = 'STOP',
-            command = self.stop_video,
-            font = helv36
+            text='STOP',
+            command=self.stop_video,
+            font=helv36
         )
         self.replay_btn = tk.Button(
             self.bottom_frame,
-            text = 'REPLAY',
-            command = self.replay_video,
-            font = helv36
+            text='REPLAY',
+            command=self.replay_video,
+            font=helv36
         )
         self.video_canvas = tk.Canvas(
             self.top_frame,
+            width=self.playback_resolution[0],
+            height=self.playback_resolution[1],
+            background='black'
         )
         self.video_canvas.grid(row=0, column=0)
         self.toggle_webcam_btn.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
@@ -84,12 +88,13 @@ class MockerWB(tk.Tk):
 
     def update(self):
         if self.video_capture.video != None and self.playing:
-            ret, frame = self.video_capture.get_frame()
-            self.ret = ret
+            self.ret, frame = self.video_capture.get_frame()
             if self.ret:
                 self.current_frame = frame
-                self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
-                self.video_canvas.create_image(0,0, image = self.photo, anchor = tk.NW)
+                image = PIL.Image.fromarray(frame)
+                image = image.resize(self.playback_resolution, PIL.Image.Resampling.LANCZOS)
+                self.photo = PIL.ImageTk.PhotoImage(image=image)
+                self.video_canvas.create_image(0,0, image=self.photo, anchor=tk.NW)
             else:
                 self.current_frame = None
                 self.playing = False
@@ -97,7 +102,7 @@ class MockerWB(tk.Tk):
 
     def toggle_webcam(self):
         if self.webcam:
-            self.toggle_webcam_btn.config(background = "#7E7E7E")
+            self.toggle_webcam_btn.config(background="#7E7E7E")
             self.replay_btn["state"] = "normal"
             self.open_file_btn["state"] = "normal"
             self.play_btn["state"] = "normal"
@@ -105,13 +110,12 @@ class MockerWB(tk.Tk):
             self.video_capture.reset()
             self.webcam = False
         else:
-            self.toggle_webcam_btn.config(background = "red")
+            self.toggle_webcam_btn.config(background="red")
             self.replay_btn["state"] = "disabled"
             self.open_file_btn["state"] = "disabled"
             self.play_btn["state"] = "disabled"
             self.stop_btn["state"] = "disabled"
             self.video_capture.set(0)
-            self.resize_video_canvas()
             self.playing = True
             self.webcam = True
 
@@ -131,28 +135,18 @@ class MockerWB(tk.Tk):
     def select_file(self):
         filename = filedialog.askopenfile(
             title='Open a video file',
-            initialdir = os.getcwd(),
-            filetypes = [('MP4 files', '*.mp4')]
+            initialdir=os.getcwd(),
+            filetypes=[('MP4 files', '*.mp4')]
         )
         if filename != None:
             self.video_capture.set(filename.name)
-            self.resize_video_canvas()
             self.playing = False
             filename.close()
-
-    def resize_video_canvas(self):
-        self.video_canvas.config(
-            width = self.video_capture.width,
-            height = self.video_capture.height,
-            background = "black"
-        )
 
 class VideoCapture():
     def __init__(self) -> None:
         self.video = None
         self.current = ""
-        self.width = 0
-        self.height = 0
     
     def set(self, path: str) -> None:
         if self.video != None:
@@ -160,14 +154,12 @@ class VideoCapture():
         self.video = cv2.VideoCapture(path)
         if not self.video.isOpened():
             raise ValueError("Unable to open video source", path)
-        self.width = self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.height = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.current = path
 
     def reset(self):
         self.video = None
 
-    def get_frame(self):
+    def get_frame(self) -> tuple[bool, cv2.Mat] | tuple[bool, None]:
         if self.video != None and self.video.isOpened():
             ret, frame = self.video.read()
             if ret == True:
@@ -236,6 +228,6 @@ class MockerCaptureCameraServer:
                     except Exception as error:
                         print(f"Failed to send shutdown signal: {error}")
 
-
-mocker = MockerWB()
-mocker.mainloop()
+if __name__ == "__main__":
+    mocker = MockerWB()
+    mocker.mainloop()
