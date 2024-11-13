@@ -13,7 +13,7 @@ Follow these steps to set up the project:
    ```bash
    python3 -m venv env
    ```
-````
+
 
 2. **Activate the virtual environment**:
 
@@ -28,14 +28,18 @@ Follow these steps to set up the project:
      .\env\Scripts\activate
      ```
 
-3. **Install dependencies** (if any):
+3. **Install dependencies**:
 
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Run the project**
-
+   
+   ```bash
+   python3 Application.py
+   ```
+   
 5. **Deactivate the environment** when done:
 
    ```bash
