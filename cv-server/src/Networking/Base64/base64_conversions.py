@@ -1,6 +1,8 @@
 import base64
+
 import cv2
 import numpy as np
+
 
 def base64_to_image(input_str: str) -> cv2.Mat:
     '''
@@ -12,9 +14,12 @@ def base64_to_image(input_str: str) -> cv2.Mat:
 
     return image_mat
 
+
 def image_to_base64(image: cv2.Mat) -> str:
-    ''' Function to convert cv2 Mat to base64 string '''
+    '''
+    Function to convert cv2 Mat to base64 string
+    '''
     retval, buffer = cv2.imencode('.jpg', image)
-    base64_string = base64.b64encode(buffer)
+    base64_string = base64.b64encode(buffer).decode('utf-8')
 
     return base64_string
