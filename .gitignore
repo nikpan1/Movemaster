@@ -5,3 +5,4 @@ main-app/MoveMaster-app/Temp/workerlic
 *.pyc
 /main-app/MoveMaster-app/.vs
 /main-app/MoveMaster-app/.vs/MoveMaster-app/v17
+/cv-server/env

@@ -2,9 +2,9 @@ from pydantic import BaseModel
 
 
 class Frame(BaseModel):
-    image_base64: str
+    base64_image: str
 
 
 class Settings(BaseModel):
-    detection_confidence: float
-    tracking_confidence: float
+    min_detection_confidence: float
+    min_tracking_confidence: float
