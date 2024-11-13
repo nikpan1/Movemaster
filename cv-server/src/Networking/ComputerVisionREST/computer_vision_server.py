@@ -33,43 +33,45 @@ class ComputerVisionServer:
         uvicorn.run(self.app, host=cv_server_address, port=cv_server_port)
 
     def setup_calls(self) -> None:
-        @self.app.get("/health")
+        @self.app.get("/healthcheck")
         async def health_check():
             """
             Function for unity server to check if computer vision server is running
             """
             self.IS_UNITY_RUNNING = True
-            return {"status": "OK"}
+            return "{\"status\": \"OK\"}"
 
         @self.app.post("/process")
         async def process_frame(frame: Frame):
             """
             Function to receive images in base64 format and then process them through estimation model
-            and return its result
+            and return its result.
             """
             if self.pose_landmark_extractor is None:
+                self.pose_landmark_extractor = PoseLandmarkExtractor()
                 logging.warning("pose_landmark_extractor is None.")
-                return {"positions": json.dumps([])}
+                return {"points": []}
 
             image = base64_to_image(frame.image_base64)
             landmarks_array = self.pose_landmark_extractor.extract_landmarks(image)
-            landmarks_json = json.dumps(landmarks_array.tolist())
-            return {"positions": json.dumps(landmarks_json)}
+
+            return {"points": landmarks_array.tolist()}
 
         @self.app.post("/settings")
         async def load_settings(settings: Settings):
             """
             Applying settings given by unity server to pose estimation algorithm
             """
-            self.pose_landmark_extractor = PoseLandmarkExtractor(settings.detection_confidence,
-                                                                 settings.tracking_confidence)
+            self.pose_landmark_extractor = PoseLandmarkExtractor(settings.min_detection_confidence,
+                                                                 settings.min_tracking_confidence)
             return {"message": "Settings applied successfully"}
 
-        @self.app.post("/shutdown")
+        @self.app.delete("/shutdown")
         async def shutdown():
             """
             Signal from unity server to shut down computer vision server
             """
+            logging.info("Shutdown signal.")
             self.IS_UNITY_RUNNING = False
             os.kill(os.getpid(), signal.SIGTERM)
             return {"message": "CVServer shutting down"}

@@ -39,7 +39,8 @@ Follow these steps to set up the project:
    ```bash
    python3 Application.py
    ```
-   
+   You can eventually use `--mock` if you want to emulate the camera by a mp4 format file
+
 5. **Deactivate the environment** when done:
 
    ```bash

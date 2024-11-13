@@ -173,7 +173,9 @@ public class ComputerVisionServer : MonoBehaviour
                 }
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
+                    // @TODO: Here I want to make a way to read an array of json objects
                     Debug.Log("Got the array with points");
+                    Debug.Log("The data is: " + response);
                 }
             }
         }
@@ -204,6 +206,7 @@ public class ComputerVisionServer : MonoBehaviour
                 }
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
+                    // @TODO: Here I want to have a seperate class for settings
                     Debug.Log("Settings were changed");
                 }
             }
@@ -213,8 +216,5 @@ public class ComputerVisionServer : MonoBehaviour
             Debug.LogError("Error from computer vision server: " + error.Message);
         }
     }
-
-
-
 
 }

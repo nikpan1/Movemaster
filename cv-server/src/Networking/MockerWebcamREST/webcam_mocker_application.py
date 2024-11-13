@@ -66,6 +66,8 @@ class WebcamMockerApplication(tk.Tk):
                 image = image.resize(self.playback_resolution, PIL.Image.Resampling.LANCZOS)
                 self.photo = PIL.ImageTk.PhotoImage(image=image)
                 self.video_canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+
+                self.server.latest_frame = self.current_frame
             else:
                 self.current_frame = None
                 self.playing = False

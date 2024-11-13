@@ -18,16 +18,15 @@ class PoseLandmarkExtractor:
 
     def extract_landmarks(self, frame: cv2.Mat) -> np.ndarray:
         """
-        Process the given frame to detect pose landmarks and return a fixed-size array of (33 landmarks * 3 values).
-
-        Each landmark will have three values: [x, y, visibility].
-        If a landmark is detected, x and y will hold the coordinates, and visibility will be 1.0.
-        If not detected, x and y will be 0, and visibility will be 0.0.
+        Process the given frame to detect pose landmarks and return a fixed-size array of (33 landmarks * 3 values),
+        where each landmark contains [x, y, z] coordinates.
 
         :param frame: Input frame in the form of a cv2.Mat.
-        :return: A NumPy array of shape (33, 3) where each row represents [x, y, visibility].
+        :return: A tuple containing:
+            - xyz: A NumPy array of shape (33, 3) where each row represents [x, y, z].
+            - fixed_size_array: A NumPy array of shape (33, 3) where each row represents [x, y, z].
         """
-        landmarks_array = np.zeros((33, 3), dtype=np.float32)
+        xyz = np.zeros((33, 3), dtype=np.float32)
 
         results = self.mp_pose.process(frame)
 
@@ -38,11 +37,11 @@ class PoseLandmarkExtractor:
                 if i >= 33:
                     break
 
-                landmarks_array[i, 0] = landmark.x * width
-                landmarks_array[i, 1] = landmark.y * height
-                landmarks_array[i, 2] = 1.0
+                xyz[i, 0] = landmark.x * width  # x-coordinate
+                xyz[i, 1] = landmark.y * height  # y-coordinate
+                xyz[i, 2] = landmark.z  # z-coordinate (depth from the camera)
 
-        return landmarks_array
+        return xyz
 
     def draw_landmarks(self, image: cv2.Mat, landmarks: np.ndarray):
         """
