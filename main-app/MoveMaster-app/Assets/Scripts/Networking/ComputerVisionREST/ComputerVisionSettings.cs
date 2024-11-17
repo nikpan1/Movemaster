@@ -11,3 +11,4 @@ public class ComputerVisionSettings
         return JsonUtility.ToJson(this);
     }
 }
+

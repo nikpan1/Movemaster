@@ -1,3 +1,4 @@
+import logging
 import os
 import threading
 import tkinter as tk
@@ -30,6 +31,8 @@ class WebcamMockerApplication(tk.Tk):
         self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
         self.server_thread.start()
         self.update()
+
+        self.counter = 0
 
     def gui_setup(self):
         self.wm_title("Webcam Mocker")
@@ -68,7 +71,10 @@ class WebcamMockerApplication(tk.Tk):
                 self.video_canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
 
                 self.server.latest_frame = self.current_frame
+                self.server.send_async_frame_to_unity(self.server.latest_frame)
+                self.counter +=1
             else:
+                logging.info("OOO-", self.counter)
                 self.current_frame = None
                 self.playing = False
 

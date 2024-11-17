@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 
 
-public class RESTBaseServer : MonoBehaviour, IDisposable
+public class RESTBaseServer : IDisposable
 {
     #region Endpoint storage
     private delegate string EndpointFunction(string input);
@@ -21,70 +21,46 @@ public class RESTBaseServer : MonoBehaviour, IDisposable
     private readonly string serverUrl = "http://localhost:7000/";
     #endregion
 
+    private class EndpointQueue
+    {
+        public ConcurrentQueue<HttpListenerContext> Queue = new();
+        public bool IsProcessing = false;
+    }
+
+    private readonly ConcurrentDictionary<string, EndpointQueue> endpointQueues = new();
+    
     private readonly HttpClient httpClient = new();
     private readonly HttpListener httpListener = new();
 
-    #region Singleton Implementation
-    private static RESTBaseServer _instance;
+    private static SemaphoreSlim semaphore = new(8);
 
-    public static RESTBaseServer Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<RESTBaseServer>();
-                if (_instance == null)
-                {
-                    GameObject singletonObject = new GameObject("RESTBaseServer");
-                    _instance = singletonObject.AddComponent<RESTBaseServer>();
-                }
-            }
-            return _instance;
-        }
-    }
-
-    private void Start()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this;
-
-        // Making the singleton persist across scenes
-        DontDestroyOnLoad(gameObject);
-    }
-    #endregion
-
+    // ReSharper disable Unity.PerformanceAnalysis
     private void Log(string message) => Debug.Log("[REST Base Server] : " + message);
+    // ReSharper disable Unity.PerformanceAnalysis
     private void LogError(string message) => Debug.LogError("[REST Base Server] : " + message);
-    private void Awake() => StartListener();
-    private void OnDestroy() => StopListener();
-
-
-    private void StartListener()
+    
+    public RESTBaseServer()
     {
-        RegisterAction(ApiMethod.GET, "/healthcheck", HandleHealthCheck);
-
-        isListenerRunning = true;
-
         if (!HttpListener.IsSupported)
         {
-            LogError("HttpListener is not supported on this platform.");
-            return;
+            throw new PlatformNotSupportedException("This platform does not support HTTP listeners.");
         }
 
+        RegisterAction(ApiMethod.GET, "/healthcheck", HandleHealthCheck);
+        
         httpListener.Prefixes.Add(serverUrl);
         httpClient.Timeout = TimeSpan.FromSeconds(30);
-        httpListener.Start();
-
-        Task.Run(() => ListenForRequests());
+        httpListener.Start(); 
+        
+        isListenerRunning = true;
+    }
+    
+    public void StartListener()
+    {
+        Task.Run(ListenForRequests);
     }
 
-    private void StopListener()
+    public void StopListener()
     {
         isListenerRunning = false;
         httpListener.Stop();
@@ -92,44 +68,78 @@ public class RESTBaseServer : MonoBehaviour, IDisposable
 
     private async Task ListenForRequests()
     {
-        var taskQueue = new ConcurrentQueue<Task>();
-
         while (isListenerRunning && httpListener.IsListening)
         {
             try
             {
                 HttpListenerContext context = await httpListener.GetContextAsync();
-                taskQueue.Enqueue(HandleRequestAsync(context));
+                string endpoint = context.Request.Url.AbsolutePath;
+
+                // Ensure an endpoint queue exists
+                var queue = endpointQueues.GetOrAdd(endpoint, _ => new EndpointQueue());
+
+                lock (queue)
+                {
+                    // Clear the queue and add the new request
+                    while (queue.Queue.TryDequeue(out _)) { }
+                    queue.Queue.Enqueue(context);
+
+                    // If not already processing, start processing
+                    if (!queue.IsProcessing)
+                    {
+                        queue.IsProcessing = true;
+                        Task.Run(() => ProcessQueue(endpoint));
+                    }
+                }
             }
             catch (ObjectDisposedException) when (!isListenerRunning)
             {
                 Log($"Listener has been closed gracefully.");
             }
-
-            // Process queued requests concurrently.
-            while (taskQueue.TryDequeue(out var task))
+            catch (Exception ex)
             {
-                await task;  // Handle requests asynchronously in parallel
+                LogError($"Error in listener: {ex.Message}");
             }
-            await Task.Delay(100);
         }
     }
-    private async Task HandleRequestAsync(HttpListenerContext context)
+
+    private async Task ProcessQueue(string endpoint)
     {
-        try
-        {
-            HttpListenerRequest request = context.Request;
-            string requestContent = await ReadRequestContent(request);
+        if (!endpointQueues.TryGetValue(endpoint, out var queue))
+            return;
 
-            RESTEndpoint endpointType = new(request.Url.AbsolutePath, request.HttpMethod.ToApiMethod());
-            string responseContent = CallEndpoint(endpointType, requestContent);
-
-            await SendResponse(context.Response, responseContent);
-        }
-        catch (Exception ex)
+        while (queue.Queue.TryDequeue(out HttpListenerContext context))
         {
-            LogError($"Error handling request: {ex.Message}");
+            try
+            {
+                await HandleRequest(context);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error processing request for endpoint {endpoint}: {ex.Message}");
+                context.Response.StatusCode = 500;
+                context.Response.Close();
+            }
         }
+
+        // Mark the endpoint as no longer processing
+        lock (queue)
+        {
+            queue.IsProcessing = false;
+        }
+    }
+
+    
+    private async Task HandleRequest(HttpListenerContext context)
+    {
+        HttpListenerRequest request = context.Request;
+
+        string requestContent = await ReadRequestContent(request);
+
+        RESTEndpoint endpointType = new(request.Url.AbsolutePath, request.HttpMethod.ToApiMethod());
+        string responseContent = CallEndpoint(endpointType, requestContent);
+
+        await SendResponse(context.Response, responseContent);
     }
 
     private async Task<string> ReadRequestContent(HttpListenerRequest request)
@@ -146,9 +156,7 @@ public class RESTBaseServer : MonoBehaviour, IDisposable
         using Stream outputStream = response.OutputStream;
         await outputStream.WriteAsync(buffer, 0, buffer.Length);
     }
-
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(10); // Limit to 10 concurrent requests
-
+    
     public async Task<string> SendRequest(RESTEndpoint endpoint, string url, string content = null)
     {
         await semaphore.WaitAsync();  // Limit concurrency
@@ -212,7 +220,7 @@ public class RESTBaseServer : MonoBehaviour, IDisposable
         }
     }
 
-    public string CallEndpoint(RESTEndpoint endpointType, string input)
+    private string CallEndpoint(RESTEndpoint endpointType, string input)
     {
         Log("Endpoint called: " + endpointType.Url + " (" + endpointType.Method + ")");
         if (!endpointActions.ContainsKey(endpointType))
