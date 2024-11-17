@@ -8,7 +8,7 @@ from fastapi import FastAPI, BackgroundTasks
 
 from Networking.Base64.base64_conversions import *
 from Networking.WebcamREST.webcam_video_capture import WebcamVideoCapture
-
+import asyncio
 
 class WebcamCaptureServer:
     def __init__(self, unity_server_address="localhost", unity_port_number=7000, device_id=0):
@@ -64,3 +64,25 @@ class WebcamCaptureServer:
                                           json={"message": "Camera capture server is shutting down"})
                     except Exception as error:
                         logging.warning(f"Failed to send shutdown signal: {error}")
+
+    def send_frame_to_unity(self, frame_base64: str) -> None:
+        """
+        Sends the provided base64-encoded frame as a plain string to the Unity server using a POST request to '/new_frame',
+        ensuring proper task management to avoid warnings or errors.
+        :param frame_base64: Base64-encoded string representing the frame
+        """
+        async def _send():
+            try:
+                unity_endpoint = f"{self.UNITY_SERVER_URL}/new_frame"
+                async with httpx.AsyncClient() as client:
+                    await client.post(unity_endpoint, data=frame_base64, headers={"Content-Type": "text/plain"})
+            except Exception as e:
+                logging.error(f"Error sending frame to Unity: {e}")
+
+        try:
+            # Get the current running event loop
+            loop = asyncio.get_running_loop()
+            loop.create_task(_send())  # Schedule the coroutine
+        except RuntimeError:
+            # If no loop is running, create one explicitly and run the task
+            asyncio.run(_send())

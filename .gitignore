@@ -2,7 +2,11 @@
 /main-app/MoveMaster-app/Temp
 main-app/MoveMaster-app/Temp/workerlic
 /cv-server/.idea
+*.cache
 *.pyc
 /main-app/MoveMaster-app/.vs
 /main-app/MoveMaster-app/.vs/MoveMaster-app/v17
 /cv-server/env
+/main-app/MoveMaster-app/Assets/Packages
+/main-app/MoveMaster-app/Packages
+/main-app/MoveMaster-app/obj

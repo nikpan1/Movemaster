@@ -1,23 +1,38 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 
 public class WebcamImageCaptureHandler : MonoBehaviour
 {
-    public Texture Image { get; private set; }
+    private Texture Image { get; set; }
     private readonly string webcamImageCaptureServerUrl = "http://localhost:8001";
     private readonly WebcamImageCaptureSettings settings = new();
 
     public UnityEvent<Texture> onNewFrameTriggerTexture;
     public UnityEvent<string> onNewFrameTriggerReceivedJson;
 
-    private void Start() => SendSettings();
-    private void OnApplicationQuit() => SendShutdown();
-
+    private RESTBaseServer _baseServer;
+    
     private void Awake()
+    { 
+        _baseServer = new RESTBaseServer();
+        _baseServer.StartListener();
+        _baseServer.RegisterAction(ApiMethod.POST, "/new_frame", HandleNewFrame);
+        _baseServer.RegisterAction(ApiMethod.PUT, "/new_frame", HandleNewFrameReceive);
+        
+        SendSettings(); 
+    }
+
+    private string HandleNewFrameReceive(string s)
     {
-        RESTBaseServer.Instance.RegisterAction(ApiMethod.POST, "/new_frame", HandleNewFrame);
+        Debug.Log(s);
+        return "P";
+    }
+
+    private void OnApplicationQuit()
+    {
+        SendShutdown();
+        _baseServer.StopListener();
     }
 
     private string HandleNewFrame(string input)
@@ -39,7 +54,7 @@ public class WebcamImageCaptureHandler : MonoBehaviour
         RESTEndpoint endpoint = new("/shutdown", ApiMethod.DELETE);
         string content = "";
 
-        _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
+        _ = _baseServer.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
 
     public void SendSettings()
@@ -47,6 +62,6 @@ public class WebcamImageCaptureHandler : MonoBehaviour
         RESTEndpoint endpoint = new("/settings", ApiMethod.POST);
         string content = settings.ToJson();
 
-        _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
+        _ = _baseServer.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
 }

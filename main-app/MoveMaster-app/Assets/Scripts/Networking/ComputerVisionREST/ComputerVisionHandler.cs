@@ -26,16 +26,16 @@ public class ComputerVisionHandler : MonoBehaviour
     {
         RESTEndpoint endpoint = new("/frame", ApiMethod.GET);
 
-        string content = await RESTBaseServer.Instance.SendRequest(endpoint, "http://localhost:8001", null);
+        // string content = await RESTBaseServer.Instance.SendRequest(endpoint, "http://localhost:8001", null);
         
-        Debug.Log(content);
-        ComputerVisionRequest request = JsonUtility.FromJson<ComputerVisionRequest>(content);
+        // Debug.Log(content);
+        // ComputerVisionRequest request = JsonUtility.FromJson<ComputerVisionRequest>(content);
 
         endpoint = new("/process", ApiMethod.POST);     
-        string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
-        Debug.Log(result);
+        //string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
+        //Debug.Log(result);
 
-        Data = ExtractData(result);
+        //Data = ExtractData(result);
     }
 
     public async void SendFrame(string base64frame)
@@ -53,7 +53,7 @@ public class ComputerVisionHandler : MonoBehaviour
         RESTEndpoint endpoint = new("/shutdown", ApiMethod.DELETE);
         string content = "";
 
-        _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
+        // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
 
     public void SendSettings()
@@ -61,7 +61,7 @@ public class ComputerVisionHandler : MonoBehaviour
         RESTEndpoint endpoint = new("/settings", ApiMethod.POST);
         string content = settings.ToJson();
 
-        _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
+        // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
 
     public ComputerVisionData ExtractData(string jsonString)
