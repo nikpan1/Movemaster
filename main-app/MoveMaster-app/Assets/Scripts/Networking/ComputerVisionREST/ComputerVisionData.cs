@@ -10,5 +10,5 @@ public class ComputerVisionData
 [System.Serializable]
 public class ComputerVisionRequest
 {
-    public string image_base64;
+    public string base64_image;
 }

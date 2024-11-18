@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Http;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -24,14 +25,14 @@ public class ComputerVisionHandler : MonoBehaviour
 
     public async void GetFrame()
     {
-        RESTEndpoint endpoint = new("/frame", ApiMethod.GET);
+        RESTEndpoint endpoint = new("/frame", HttpMethod.Get);
 
         // string content = await RESTBaseServer.Instance.SendRequest(endpoint, "http://localhost:8001", null);
         
         // Debug.Log(content);
         // ComputerVisionRequest request = JsonUtility.FromJson<ComputerVisionRequest>(content);
 
-        endpoint = new("/process", ApiMethod.POST);     
+        endpoint = new("/process", HttpMethod.Post);     
         //string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
         //Debug.Log(result);
 
@@ -41,7 +42,7 @@ public class ComputerVisionHandler : MonoBehaviour
     public async void SendFrame(string base64frame)
     {
         // this should we optimize
-        RESTEndpoint endpoint = new("/process", ApiMethod.POST);
+        RESTEndpoint endpoint = new("/process", HttpMethod.Post);
         //string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, base64frame);
         
         //Data = ExtractData(result);
@@ -50,7 +51,7 @@ public class ComputerVisionHandler : MonoBehaviour
 
     private void SendShutdown()
     {
-        RESTEndpoint endpoint = new("/shutdown", ApiMethod.DELETE);
+        RESTEndpoint endpoint = new("/shutdown", HttpMethod.Delete);
         string content = "";
 
         // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
@@ -58,7 +59,7 @@ public class ComputerVisionHandler : MonoBehaviour
 
     public void SendSettings()
     {
-        RESTEndpoint endpoint = new("/settings", ApiMethod.POST);
+        RESTEndpoint endpoint = new("/settings", HttpMethod.Post);
         string content = settings.ToJson();
 
         // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);

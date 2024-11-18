@@ -24,7 +24,7 @@ class MockerVideoCapture:
         if self.video is not None and self.video.isOpened():
             ret, frame = self.video.read()
             if ret:
-                return ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                return ret, frame
             else:
                 return ret, None
         else:

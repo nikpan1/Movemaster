@@ -1,18 +1,25 @@
 using System;
+using System.Net.Http;
 
 [Serializable]
 public class RESTEndpoint
 {
     public string Url { get; }
-    public ApiMethod Method { get; }
+    public HttpMethod Method { get; }
 
-    public RESTEndpoint(string url, ApiMethod method)
+    public RESTEndpoint(string url, string method)
+    {
+        Url = url;
+        Method = new(method);
+    }
+    
+    public RESTEndpoint(string url, HttpMethod method)
     {
         Url = url;
         Method = method;
     }
 
-    #region Equals and GetHashCode for dictionary usage
+    #region Dictionary Key Logic for RESTEndpoint
 
     public override bool Equals(object obj)
     {

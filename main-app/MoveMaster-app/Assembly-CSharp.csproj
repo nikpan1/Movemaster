@@ -45,9 +45,9 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Networking\RESTMehods.cs" />
     <Compile Include="Assets\Scripts\Networking\WebcamREST\WebcamImageCaptureHandler.cs" />
     <Compile Include="Assets\Scripts\Networking\RESTSupplier.cs" />
+    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\Example.cs" />
     <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionSettings.cs" />
     <Compile Include="Assets\Scripts\Exercise.cs" />
     <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionData.cs" />
@@ -78,8 +78,8 @@
     <None Include="Library\PackageCache\com.unity.modules.imgui@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.tilemap@1.0.0\package.json" />
     <None Include="Assets\Packages\NaCl.Net.0.1.13\lib\netstandard2.1\NaCl.xml" />
-    <None Include="Assets\Packages\NetMQ.4.0.1.13\lib\netstandard2.1\NetMQ.xml" />
     <None Include="Library\PackageCache\com.unity.timeline@1.7.6\package.json" />
+    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\useSharedDesignerContext.txt" />
     <None Include="Library\PackageCache\com.unity.ide.visualstudio@2.0.22\ValidationConfig.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Library\PackageCache\com.unity.modules.terrainphysics@1.0.0\package.json" />
@@ -88,7 +88,6 @@
     <None Include="Library\PackageCache\com.unity.editorcoroutines@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.timeline@1.7.6\ValidationExceptions.json" />
     <None Include="Library\PackageCache\com.unity.collab-proxy@2.5.2\package.json" />
-    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.xml" />
     <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.7\PackageConversionData.json" />
     <None Include="Library\PackageCache\com.unity.modules.unitywebrequestassetbundle@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.ide.visualstudio@2.0.22\package.json" />
@@ -99,7 +98,10 @@
     <None Include="Library\PackageCache\com.unity.modules.unityanalytics@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.ide.rider@3.0.31\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.video@1.0.0\package.json" />
+    <None Include="Assets\Packages\NetMQ.4.0.1.13\lib\netstandard2.1\NetMQ.xml" />
     <None Include="Library\PackageCache\com.unity.test-framework@1.1.33\package.json" />
+    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\version.txt" />
+    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.xml" />
     <None Include="Library\PackageCache\com.unity.performance.profile-analyzer@1.2.2\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.particlesystem@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.physics2d@1.0.0\package.json" />
@@ -126,10 +128,8 @@
     <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.7\Editor Resources\Shaders\TMP_SDF_SSD.cginc" />
     <None Include="Library\PackageCache\com.unity.collab-proxy@2.5.2\ValidationConfig.json" />
     <None Include="Library\PackageCache\com.unity.modules.xr@1.0.0\package.json" />
-    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\useSharedDesignerContext.txt" />
     <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.7\Editor Resources\Shaders\TMP_Properties.cginc" />
     <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.7\Editor Resources\Shaders\TMP_SDF Internal Editor.shader" />
-    <None Include="Assets\Packages\System.Security.Principal.Windows.5.0.0\version.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Library\PackageCache\com.unity.modules.director@1.0.0\package.json" />
     <None Include="Library\PackageCache\com.unity.ide.vscode@1.2.5\ValidationExceptions.json" />
@@ -401,14 +401,14 @@
     <Reference Include="ReportGeneratorMerged">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.testtools.codecoverage@1.2.6\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
-    <Reference Include="NaCl">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NaCl.Net.0.1.13\lib\netstandard2.1\NaCl.dll</HintPath>
+    <Reference Include="NetMQ">
+      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NetMQ.4.0.1.13\lib\netstandard2.1\NetMQ.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.visualscripting@1.9.4\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="NetMQ">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NetMQ.4.0.1.13\lib\netstandard2.1\NetMQ.dll</HintPath>
+    <Reference Include="NaCl">
+      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NaCl.Net.0.1.13\lib\netstandard2.1\NaCl.dll</HintPath>
     </Reference>
     <Reference Include="System.Security.Principal.Windows">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.dll</HintPath>

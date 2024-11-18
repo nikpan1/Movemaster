@@ -9,17 +9,11 @@ using System.Collections.Concurrent;
 using System.Threading;
 
 
-public class RESTBaseServer : IDisposable
+public class RestBaseServer : IDisposable
 {
-    #region Endpoint storage
+    #region Endpoint Management
     private delegate string EndpointFunction(string input);
-    private ConcurrentDictionary<RESTEndpoint, EndpointFunction> endpointActions = new();
-    #endregion
-
-    #region Server settings
-    private bool isListenerRunning = false;
-    private readonly string serverUrl = "http://localhost:7000/";
-    #endregion
+    private ConcurrentDictionary<RESTEndpoint, EndpointFunction> _endpointActions = new();
 
     private class EndpointQueue
     {
@@ -27,32 +21,40 @@ public class RESTBaseServer : IDisposable
         public bool IsProcessing = false;
     }
 
-    private readonly ConcurrentDictionary<string, EndpointQueue> endpointQueues = new();
-    
-    private readonly HttpClient httpClient = new();
-    private readonly HttpListener httpListener = new();
+    private readonly ConcurrentDictionary<string, EndpointQueue> _endpointQueues = new();
+    #endregion
 
-    private static SemaphoreSlim semaphore = new(8);
+    #region Server Configuration
+    private const string ServerUrl = "http://localhost:7000/";
 
-    // ReSharper disable Unity.PerformanceAnalysis
+    private readonly HttpClient _client = new();
+    private readonly HttpListener _listener = new();
+    private static readonly SemaphoreSlim RequestConcurrencySemaphore = new(8); // renamed for clarity
+
+    private bool _isListenerRunning = false;
+    #endregion
+
+    #region Logging Utilities
+
     private void Log(string message) => Debug.Log("[REST Base Server] : " + message);
-    // ReSharper disable Unity.PerformanceAnalysis
     private void LogError(string message) => Debug.LogError("[REST Base Server] : " + message);
+    #endregion
     
-    public RESTBaseServer()
+    
+    public RestBaseServer()
     {
         if (!HttpListener.IsSupported)
         {
             throw new PlatformNotSupportedException("This platform does not support HTTP listeners.");
         }
 
-        RegisterAction(ApiMethod.GET, "/healthcheck", HandleHealthCheck);
+        RegisterAction("/healthcheck", HttpMethod.Get, HandleHealthCheck);
         
-        httpListener.Prefixes.Add(serverUrl);
-        httpClient.Timeout = TimeSpan.FromSeconds(30);
-        httpListener.Start(); 
+        _listener.Prefixes.Add(ServerUrl);
+        _client.Timeout = TimeSpan.FromSeconds(10);
+        _listener.Start(); 
         
-        isListenerRunning = true;
+        _isListenerRunning = true;
     }
     
     public void StartListener()
@@ -62,29 +64,26 @@ public class RESTBaseServer : IDisposable
 
     public void StopListener()
     {
-        isListenerRunning = false;
-        httpListener.Stop();
+        _isListenerRunning = false;
+        _listener.Stop();
     }
 
     private async Task ListenForRequests()
     {
-        while (isListenerRunning && httpListener.IsListening)
+        while (_isListenerRunning && _listener.IsListening)
         {
             try
             {
-                HttpListenerContext context = await httpListener.GetContextAsync();
+                HttpListenerContext context = await _listener.GetContextAsync();
                 string endpoint = context.Request.Url.AbsolutePath;
-
-                // Ensure an endpoint queue exists
-                var queue = endpointQueues.GetOrAdd(endpoint, _ => new EndpointQueue());
+                var queue = _endpointQueues.GetOrAdd(endpoint, _ => new EndpointQueue());
 
                 lock (queue)
                 {
                     // Clear the queue and add the new request
-                    while (queue.Queue.TryDequeue(out _)) { }
+                    while (queue.Queue.TryDequeue(out _));
                     queue.Queue.Enqueue(context);
 
-                    // If not already processing, start processing
                     if (!queue.IsProcessing)
                     {
                         queue.IsProcessing = true;
@@ -92,23 +91,19 @@ public class RESTBaseServer : IDisposable
                     }
                 }
             }
-            catch (ObjectDisposedException) when (!isListenerRunning)
+            catch (ObjectDisposedException) when (!_isListenerRunning)
             {
                 Log($"Listener has been closed gracefully.");
-            }
-            catch (Exception ex)
-            {
-                LogError($"Error in listener: {ex.Message}");
             }
         }
     }
 
     private async Task ProcessQueue(string endpoint)
     {
-        if (!endpointQueues.TryGetValue(endpoint, out var queue))
+        if (!_endpointQueues.TryGetValue(endpoint, out var queue))
             return;
 
-        while (queue.Queue.TryDequeue(out HttpListenerContext context))
+        while (queue.Queue.TryDequeue(out var context))
         {
             try
             {
@@ -117,12 +112,12 @@ public class RESTBaseServer : IDisposable
             catch (Exception ex)
             {
                 LogError($"Error processing request for endpoint {endpoint}: {ex.Message}");
+                // Indicating an internal error to the requester
                 context.Response.StatusCode = 500;
                 context.Response.Close();
             }
         }
 
-        // Mark the endpoint as no longer processing
         lock (queue)
         {
             queue.IsProcessing = false;
@@ -133,12 +128,10 @@ public class RESTBaseServer : IDisposable
     private async Task HandleRequest(HttpListenerContext context)
     {
         HttpListenerRequest request = context.Request;
-
         string requestContent = await ReadRequestContent(request);
-
-        RESTEndpoint endpointType = new(request.Url.AbsolutePath, request.HttpMethod.ToApiMethod());
+        RESTEndpoint endpointType = new(request.Url.AbsolutePath, request.HttpMethod);
+        
         string responseContent = CallEndpoint(endpointType, requestContent);
-
         await SendResponse(context.Response, responseContent);
     }
 
@@ -159,39 +152,25 @@ public class RESTBaseServer : IDisposable
     
     public async Task<string> SendRequest(RESTEndpoint endpoint, string url, string content = null)
     {
-        await semaphore.WaitAsync();  // Limit concurrency
+        await RequestConcurrencySemaphore.WaitAsync();
 
         try
         {
-            Log($"Request Send to {url} : {endpoint.Url} ({endpoint.Method})");
-            if (!string.IsNullOrEmpty(content))
-            {
-                Log($"Request Content: {content}");
-            }
+            HttpRequestMessage requestMessage = new();
+            requestMessage.RequestUri = new Uri(url + endpoint.Url);
+            requestMessage.Method = endpoint.Method;
 
-            string fullUrl = url + endpoint.Url;
-
-            HttpRequestMessage requestMessage = new()
-            {
-                RequestUri = new Uri(fullUrl),
-                Method = endpoint.Method.ToHttpMethod(),
-            };
-
-            // Only set content if the method supports a body
-            if (endpoint.Method != ApiMethod.GET && !string.IsNullOrEmpty(content))
+            if (IsRequestTypeSupportingBody(endpoint, content))
             {
                 requestMessage.Content = new StringContent(content, Encoding.UTF8, "application/json");
             }
 
-            HttpResponseMessage response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return responseContent;
+            HttpResponseMessage response = await _client.SendAsync(requestMessage).ConfigureAwait(false);
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
-        catch (ObjectDisposedException) when (!isListenerRunning)
+        catch (ObjectDisposedException) when (!_isListenerRunning)
         {
-            Log($"Listener has been closed gracefully.");
-            return null;
+            return null; //Listener has been closed gracefully. All good
         }
         catch (Exception ex)
         {
@@ -200,39 +179,39 @@ public class RESTBaseServer : IDisposable
         }
         finally
         {
-            semaphore.Release();  // Release the semaphore after the task completes
+            RequestConcurrencySemaphore.Release();
         }
     }
 
-    public void RegisterAction(ApiMethod method, string url, Func<string, string> func)
+    private bool IsRequestTypeSupportingBody(RESTEndpoint endpoint, string content)
     {
-        RESTEndpoint endpointType = new(url, method);
-        EndpointFunction endpointFunc = new(func);
-        Log($"Endpoint added: {endpointType.Url} ({endpointType.Method})");
+        return endpoint.Method != HttpMethod.Get && !string.IsNullOrEmpty(content);
+    }
 
-        if (!endpointActions.ContainsKey(endpointType))
-        {
-            endpointActions[endpointType] = endpointFunc;
-        }
-        else
-        {
-            endpointActions[endpointType] += endpointFunc;
-        }
+    public void RegisterAction(string endpointUrl, HttpMethod method, Func<string, string> func)
+    {
+        Log($"Endpoint added: {endpointUrl} ({method})"); 
+        
+        _endpointActions.AddOrUpdate(
+            new RESTEndpoint(endpointUrl, method),
+            _ => new EndpointFunction(func),
+            (_, existing) => existing + new EndpointFunction(func)
+        );
     }
 
     private string CallEndpoint(RESTEndpoint endpointType, string input)
     {
-        Log("Endpoint called: " + endpointType.Url + " (" + endpointType.Method + ")");
-        if (!endpointActions.ContainsKey(endpointType))
+        Log($"Endpoint called: {endpointType.Url} ({endpointType.Method})");
+
+        if (!_endpointActions.TryGetValue(endpointType, out var endpointDelegates))
         {
-            LogError($"Endpoint not found: {endpointType.Url} ({endpointType.Method})");
-            throw new Exception("Endpoint not found");
+            throw new Exception($"Endpoint was not initialized: {endpointType.Url} ({endpointType.Method})");
         }
 
-        string response = "";
-        foreach (var endpoint in endpointActions[endpointType].GetInvocationList())
+        string response = null;
+        foreach (EndpointFunction endpoint in endpointDelegates.GetInvocationList())
         {
-            response = endpoint.DynamicInvoke(input) as string;
+            response = endpoint(input) ?? response; // if the endpoint call returns a non-null value, then store it as response, but don't override it
         }
 
         return response;
@@ -243,8 +222,8 @@ public class RESTBaseServer : IDisposable
     {
         if (disposing)
         {
-            httpListener?.Close();
-            httpClient?.Dispose();
+            _listener?.Close();
+            _client?.Dispose();
         }
     }
 
@@ -258,6 +237,6 @@ public class RESTBaseServer : IDisposable
 
     private string HandleHealthCheck(string input)
     {
-        return "{\"status\": \"OK\"}";
+        return JsonUtility.ToJson(new { status = "OK" });
     }
 }
