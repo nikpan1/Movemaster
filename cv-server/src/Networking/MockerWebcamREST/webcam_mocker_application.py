@@ -24,15 +24,13 @@ class WebcamMockerApplication(tk.Tk):
         self.playing = False
         self.webcam = False
         self.ret = False
-        self.current_frame = None
+        self.current_frame = MockerCaptureCameraServer.get_blank_image()
         self.photo = None
 
         self.server = MockerCaptureCameraServer(self)
         self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
         self.server_thread.start()
         self.update()
-
-        self.counter = 0
 
     def gui_setup(self):
         self.wm_title("Webcam Mocker")
@@ -70,12 +68,7 @@ class WebcamMockerApplication(tk.Tk):
                 self.photo = PIL.ImageTk.PhotoImage(image=image)
                 self.video_canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
 
-                self.server.latest_frame = self.current_frame
-                self.server.send_async_frame_to_unity(self.server.latest_frame)
-                self.counter +=1
             else:
-                logging.info("OOO-", self.counter)
-                self.current_frame = None
                 self.playing = False
 
         self.after(self.delay, self.update)

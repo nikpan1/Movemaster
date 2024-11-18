@@ -45,31 +45,4 @@ public static class ImageUtils
 
         return texture;
     }
-
-    public static string TextureToBase64(Texture2D texture)
-    {
-        if (texture == null)
-        {
-            Debug.LogError("Texture is null.");
-            return null;
-        }
-        
-        byte[] imageBytes;
-        try
-        {
-            imageBytes = texture.EncodeToPNG();
-            if (imageBytes.Length == 0)
-            {
-                Debug.LogError("Encoded PNG data is empty.");
-                return null;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to encode texture to PNG: {ex.Message}");
-            return null;
-        }
-
-        return Convert.ToBase64String(imageBytes);
-    }
 }

@@ -10,13 +10,14 @@ from fastapi import FastAPI
 import numpy as np
 from Networking.Base64.base64_conversions import *
 
+
 class MockerCaptureCameraServer:
     def __init__(self, mocker, unity_server_address="localhost", unity_port_number=7000, max_threads=10):
         self.UNITY_SERVER_URL = f"http://{unity_server_address}:{unity_port_number}"
         self.IS_UNITY_RUNNING = False
-        self.current_frame = self.get_empty_image()
+        self.current_frame = self.get_blank_image()
         self.mocker = mocker
-
+        self.counter = 1
         self.app = FastAPI()
         self.setup_calls()
 
@@ -34,7 +35,7 @@ class MockerCaptureCameraServer:
         os.kill(os.getpid(), signal.SIGTERM)
 
     @staticmethod
-    def get_empty_image() -> np.ndarray:
+    def get_blank_image() -> np.ndarray:
         return np.zeros((100, 100, 3), dtype=np.uint8)
 
     def setup_calls(self) -> None:
@@ -50,12 +51,9 @@ class MockerCaptureCameraServer:
             self.shutdown_server()
             return {"message": "Mocker Capture Camera Server shutting down"}
 
-        @self.app.get("/capture_and_send")
+        @self.app.get("/new_frame")
         async def capture_and_send():
-            frame = self.mocker.current_frame
-            image_base64 = image_to_base64(frame)
-
-            return image_base64
+            return {"base64_image": image_to_base64(self.mocker.current_frame)}
 
         @self.app.on_event("shutdown")
         async def shutdown_event():
@@ -66,37 +64,3 @@ class MockerCaptureCameraServer:
                                           json={"message": "Mocker Camera capture server is shutting down"})
                     except Exception as error:
                         logging.warning(f"Failed to send shutdown signal: {error}")
-
-    def send_frame_to_unity_sync(self, input_string):
-        """
-        Sends a synchronous PUT request with a string payload to the Unity server.
-        """
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        # Try to acquire the semaphore without blocking
-        if self.semaphore.acquire(blocking=False):
-            with httpx.Client() as client:
-                try:
-                    response = client.put(self.UNITY_SERVER_URL + '/new_frame', data='{"key": "value"}', headers=headers)
-                    response.raise_for_status()
-                    print(f"String sent successfully: {response.status_code}")
-                    return response.status_code
-                except httpx.RequestError as e:
-                    print(f"Error sending string to Unity server: {e}")
-                    return None
-                finally:
-                    # Release the semaphore after the request is done
-                    self.semaphore.release()
-        else:
-            # If semaphore could not be acquired, discard the request
-            print("Semaphore limit reached. Request discarded.")
-            return None
-
-    def send_async_frame_to_unity(self, input_string):
-        """
-        Executes the send_frame_to_unity_sync method asynchronously, managing it through a thread pool.
-        """
-        # Submit the task to the thread pool
-        self.executor.submit(self.send_frame_to_unity_sync, input_string)
