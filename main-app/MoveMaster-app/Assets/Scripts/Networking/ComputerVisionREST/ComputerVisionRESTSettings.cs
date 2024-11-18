@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class ComputerVisionSettings
+public class ComputerVisionRESTSettings
 {
     public float min_detection_confidence = 0.7f;
     public float min_tracking_confidence = 0.7f;

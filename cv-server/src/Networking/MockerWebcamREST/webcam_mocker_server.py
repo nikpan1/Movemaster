@@ -15,9 +15,10 @@ class MockerCaptureCameraServer:
     def __init__(self, mocker, unity_server_address="localhost", unity_port_number=7000, max_threads=10):
         self.UNITY_SERVER_URL = f"http://{unity_server_address}:{unity_port_number}"
         self.IS_UNITY_RUNNING = False
+
         self.current_frame = self.get_blank_image()
         self.mocker = mocker
-        self.counter = 1
+
         self.app = FastAPI()
         self.setup_calls()
 

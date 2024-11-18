@@ -45,22 +45,24 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Networking\WebcamREST\WebcamImageCaptureHandler.cs" />
-    <Compile Include="Assets\Scripts\Networking\RESTSupplier.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\Example.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionSettings.cs" />
-    <Compile Include="Assets\Scripts\Exercise.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionData.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionServer\ComputerVisionServer.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionHandler.cs" />
+    <Compile Include="Assets\Scripts\FrameCapture\IFrameSource.cs" />
+    <Compile Include="Assets\Scripts\Widgets\MediaViewer.cs" />
+    <Compile Include="Assets\Scripts\FrameCapture\FrameCaptureManager.cs" />
+    <Compile Include="Assets\Scripts\FrameCapture\WebcamFrameSource.cs" />
     <Compile Include="Assets\Scripts\Networking\RESTEndpoint.cs" />
+    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionRESTData.cs" />
+    <Compile Include="Assets\Scripts\FrameCapture\ServerFrameSource.cs" />
+    <Compile Include="Assets\Scripts\Networking\ComputerVisionIPC\ComputerVisionIPCHandler.cs" />
     <Compile Include="Assets\Scripts\Networking\RESTBaseServer.cs" />
     <Compile Include="Assets\Scripts\Networking\Base64Conversions\ImageUtils.cs" />
-    <Compile Include="Assets\Scripts\EventSidebar.cs" />
+    <Compile Include="Assets\Scripts\Widgets\Scoreboard\ScoreboardManager.cs" />
+    <Compile Include="Assets\Scripts\FrameCapture\ServerFrameInputStructure.cs" />
     <Compile Include="Assets\Scripts\Networking\WebcamREST\WebcamImageCaptureSettings.cs" />
-    <Compile Include="Assets\Scripts\Scoreboard\ScoreboardManager.cs" />
-    <Compile Include="Assets\Scripts\Networking\ComputerVisionServer\JointPosition.cs" />
-    <Compile Include="Assets\Scripts\RotablePlatform.cs" />
+    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionRESTHandler.cs" />
+    <Compile Include="Assets\Scripts\Widgets\RotablePlatform.cs" />
+    <Compile Include="Assets\Scripts\Widgets\Sidebar\EventSidebar.cs" />
+    <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionRESTSettings.cs" />
+    <Compile Include="Assets\Scripts\Widgets\Sidebar\Exercise.cs" />
     <None Include="Library\PackageCache\com.unity.settings-manager@2.0.1\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.subsystems@1.0.0\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

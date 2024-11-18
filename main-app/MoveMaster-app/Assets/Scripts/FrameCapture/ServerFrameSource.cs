@@ -5,70 +5,68 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public class WebcamImageCaptureHandler : MonoBehaviour
+public class ServerFrameSource : IFrameSource
 {
     private Texture2D LatestFrame { get; set; }
     private const string WebcamImageCaptureServerUrl = "http://localhost:8001";
-    private readonly WebcamImageCaptureSettings _settings = new();
-    [SerializeField] private int framerate = 25; //  @TODO - this should be moved along with TASK-30 
+    private readonly WebcamImageCaptureRESTSettings _settings = new();
+    private readonly int _framerate = 25;
     
-    public UnityEvent<Texture2D> onNewFrameTriggerTexture;
-    public UnityEvent<string> onNewFrameTriggerReceivedJson;
+    private UnityEvent<Texture2D> _onNewFrameTriggerTexture;
 
     private RestBaseServer _baseServer;
     private bool _isCapturing = false;
-    public string content;
     
-    private void StopCapturing() => _isCapturing = false;
-    private void StartCapturing() => _isCapturing = true;
-    
-    private void Awake()
+    public void SetupCapture()
     { 
         _baseServer = new();
         _baseServer.StartListener(); 
         
         SendSettings();
-        StartCapturing();
-        StartCoroutine(ContinousImageCapture());
+        _isCapturing = true;
     }
     
-    private void OnApplicationQuit()
+    public void CleanupCapture()
     {
         SendShutdown();
-        StopCapturing();
+        
+        _isCapturing = false;
         _baseServer.StopListener();
     }
-    
-    private IEnumerator ContinousImageCapture()
+
+    public IEnumerator RunCapture(UnityEvent<Texture2D> trigger)
     {
+        _onNewFrameTriggerTexture = trigger;
         RESTEndpoint getFrame = new("/new_frame", HttpMethod.Get);
         while (_isCapturing)
         {
             _ = RetrieveNewFrame(getFrame);
             
-            yield return new WaitForSeconds(1 / framerate);
+            yield return new WaitForSeconds(1 / _framerate);
         }
     }
 
-    public async Task RetrieveNewFrame(RESTEndpoint getFrame)
+    private async Task RetrieveNewFrame(RESTEndpoint getFrame)
     {
-        content = await _baseServer.SendRequest(getFrame, WebcamImageCaptureServerUrl, "");
-        Debug.Log("Retrieved New Frame");
+        string content = await _baseServer.SendRequest(getFrame, WebcamImageCaptureServerUrl, "");
         HandleNewFrame(content);
     }
     
     private void HandleNewFrame(string input)
     {
         if (string.IsNullOrEmpty(input))
-            return; 
+        {
+            return;
+        } 
+        
+        // Needed in order to fix json str structure 
         input = input.Replace("\\\"", "\"");
         
-        ComputerVisionRequest request = JsonUtility.FromJson<ComputerVisionRequest>(input);
+        ServerFrameInputStructure request = JsonUtility.FromJson<ServerFrameInputStructure>(input.Replace("\\\"", "\""));
         string base64String = request.base64_image.Trim('"');
         LatestFrame = ImageUtils.Base64ToTexture(base64String);
         
-        onNewFrameTriggerReceivedJson?.Invoke(input);
-        onNewFrameTriggerTexture?.Invoke(LatestFrame);
+        _onNewFrameTriggerTexture?.Invoke(LatestFrame);
     }
 
     private void SendShutdown()
