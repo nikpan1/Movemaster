@@ -2,13 +2,13 @@ using UnityEngine;
 
 
 [System.Serializable]
-public class ComputerVisionData
+public class ComputerVisionRESTData
 {
     public Vector3[] points = new Vector3[33];
 }
 
 [System.Serializable]
-public class ComputerVisionRequest
+public class ComputerVisionRESTRequest
 {
     public string base64_image;
 }

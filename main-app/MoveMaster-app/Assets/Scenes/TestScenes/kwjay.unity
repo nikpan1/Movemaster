@@ -325,8 +325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 760712767}
-  - component: {fileID: 760712769}
-  - component: {fileID: 760712771}
+  - component: {fileID: 760712772}
   m_Layer: 0
   m_Name: Server
   m_TagString: Untagged
@@ -349,7 +348,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &760712769
+--- !u!114 &760712772
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -358,16 +357,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 760712765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d7e422f511c5fd4881bec9284a00d17, type: 3}
+  m_Script: {fileID: 11500000, guid: afd07513e671fb64899df6e08bc24c47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  framerate: 30
-  onNewFrameTriggerTexture:
+  shouldRunLocally: 1
+  onNewFrameTrigger:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1210549523}
-        m_TargetAssemblyTypeName: Example, Assembly-CSharp
-        m_MethodName: up
+      - m_Target: {fileID: 1210549526}
+        m_TargetAssemblyTypeName: MediaViewer, Assembly-CSharp
+        m_MethodName: DisplayFrame
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -377,22 +376,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onNewFrameTriggerReceivedJson:
-    m_PersistentCalls:
-      m_Calls: []
-  content: 
---- !u!114 &760712771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760712765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a554670bf0bea1f4e8ea0b6c26c75c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1210549521
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,7 +387,7 @@ GameObject:
   - component: {fileID: 1210549522}
   - component: {fileID: 1210549525}
   - component: {fileID: 1210549524}
-  - component: {fileID: 1210549523}
+  - component: {fileID: 1210549526}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -431,18 +414,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1210549523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1210549521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96807cd6f37a7324f92e1a59d598be8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1210549524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,6 +452,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1210549521}
   m_CullTransparentMesh: 1
+--- !u!114 &1210549526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210549521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa1a160d618b89e46943583ec7d13cfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1228627195
 GameObject:
   m_ObjectHideFlags: 0

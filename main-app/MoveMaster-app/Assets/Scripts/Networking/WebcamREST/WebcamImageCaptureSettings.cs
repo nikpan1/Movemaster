@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class WebcamImageCaptureSettings
+public class WebcamImageCaptureRESTSettings
 {
     // @TODO: Probably will change accordingly to TASK-30
     // Note: SendSettings() needs to be called, preferable from void Start()

@@ -4,11 +4,11 @@ using System.Net.Http;
 using UnityEngine;
 using UnityEngine.Windows;
 
-public class ComputerVisionHandler : MonoBehaviour
+public class ComputerVisionRESTHandler : MonoBehaviour
 {
-    private readonly ComputerVisionSettings settings = new();
+    private readonly ComputerVisionRESTSettings settings = new();
     private readonly string webcamImageCaptureServerUrl = "http://localhost:8000";
-    [SerializeField] public ComputerVisionData Data; //{ get; private set; }
+    [SerializeField] public ComputerVisionRESTData Data; //{ get; private set; }
 
     private void Start() => SendSettings();
     private void OnApplicationQuit() => SendShutdown();
@@ -65,7 +65,7 @@ public class ComputerVisionHandler : MonoBehaviour
         // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
 
-    public ComputerVisionData ExtractData(string jsonString)
+    public ComputerVisionRESTData ExtractData(string jsonString)
     {
         if (string.IsNullOrEmpty(jsonString))
         {
@@ -74,9 +74,8 @@ public class ComputerVisionHandler : MonoBehaviour
         }
 
         // Deserialize the JSON string into ComputerVisionData
-        ComputerVisionData extractedData = JsonUtility.FromJson<ComputerVisionData>(jsonString);
+        ComputerVisionRESTData extractedData = JsonUtility.FromJson<ComputerVisionRESTData>(jsonString);
 
-        // Now you can access the points array
         for (int i = 0; i < 33; i++)
         {
             Vector3 point = extractedData.points[i];
