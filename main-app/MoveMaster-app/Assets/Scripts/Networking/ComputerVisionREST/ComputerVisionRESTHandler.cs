@@ -1,26 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Http;
+/*using System.Net.Http;
 using UnityEngine;
-using UnityEngine.Windows;
 
 public class ComputerVisionRESTHandler : MonoBehaviour
 {
+    [SerializeField] public ComputerVisionRESTData Data; //{ get; private set; }
     private readonly ComputerVisionRESTSettings settings = new();
     private readonly string webcamImageCaptureServerUrl = "http://localhost:8000";
-    [SerializeField] public ComputerVisionRESTData Data; //{ get; private set; }
 
-    private void Start() => SendSettings();
-    private void OnApplicationQuit() => SendShutdown();
+    private void Start()
+    {
+        SendSettings();
+    }
 
 
     public void Update()
     {
-        if (UnityEngine.Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Space key was pressed.");
             GetFrame();
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SendShutdown();
     }
 
     public async void GetFrame()
@@ -28,11 +32,11 @@ public class ComputerVisionRESTHandler : MonoBehaviour
         RESTEndpoint endpoint = new("/frame", HttpMethod.Get);
 
         // string content = await RESTBaseServer.Instance.SendRequest(endpoint, "http://localhost:8001", null);
-        
+
         // Debug.Log(content);
         // ComputerVisionRequest request = JsonUtility.FromJson<ComputerVisionRequest>(content);
 
-        endpoint = new("/process", HttpMethod.Post);     
+        endpoint = new RESTEndpoint("/process", HttpMethod.Post);
         //string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
         //Debug.Log(result);
 
@@ -41,18 +45,17 @@ public class ComputerVisionRESTHandler : MonoBehaviour
 
     public async void SendFrame(string base64frame)
     {
-        // this should we optimize
         RESTEndpoint endpoint = new("/process", HttpMethod.Post);
-        //string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, base64frame);
-        
-        //Data = ExtractData(result);
+        string result = await RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, base64frame);
+
+        Data = ExtractData(result);
     }
 
 
     private void SendShutdown()
     {
         RESTEndpoint endpoint = new("/shutdown", HttpMethod.Delete);
-        string content = "";
+        var content = "";
 
         // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
@@ -60,7 +63,7 @@ public class ComputerVisionRESTHandler : MonoBehaviour
     public void SendSettings()
     {
         RESTEndpoint endpoint = new("/settings", HttpMethod.Post);
-        string content = settings.ToJson();
+        var content = settings.ToJson();
 
         // _ = RESTBaseServer.Instance.SendRequest(endpoint, webcamImageCaptureServerUrl, content);
     }
@@ -74,13 +77,14 @@ public class ComputerVisionRESTHandler : MonoBehaviour
         }
 
         // Deserialize the JSON string into ComputerVisionData
-        ComputerVisionRESTData extractedData = JsonUtility.FromJson<ComputerVisionRESTData>(jsonString);
+        var extractedData = JsonUtility.FromJson<ComputerVisionRESTData>(jsonString);
 
-        for (int i = 0; i < 33; i++)
+        for (var i = 0; i < 33; i++)
         {
-            Vector3 point = extractedData.points[i];
+            var point = extractedData.points[i];
             Debug.Log($"Point {i + 1}: {point.x}, {point.y}, {point.z}");
         }
+
         return extractedData;
     }
-}
+}*/

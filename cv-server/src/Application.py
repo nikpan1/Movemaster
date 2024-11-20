@@ -3,8 +3,8 @@ import logging
 
 from concurrent.futures import ThreadPoolExecutor
 
-from Networking.ComputerVisionREST.computer_vision_server import ComputerVisionServer
 from Networking.MockerWebcamREST.webcam_mocker_application import WebcamMockerApplication
+from Networking.ComputerVisionIPC.computer_vision_ipc import ComputerVisionIpcServer
 from Networking.WebcamREST.webcam_capture_server import WebcamCaptureServer
 
 
@@ -19,7 +19,7 @@ def main(mock_mode):
     with ThreadPoolExecutor() as executor:
         # Start the computer vision server asynchronously
         logging.info("Running computer vision server.")
-        computer_vision_server = ComputerVisionServer()
+        computer_vision_server = ComputerVisionIpcServer()
         executor.submit(computer_vision_server.start_server)
 
         # Start either the mock or the real webcam application based on the flag

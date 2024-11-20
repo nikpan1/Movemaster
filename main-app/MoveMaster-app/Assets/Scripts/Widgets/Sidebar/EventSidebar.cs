@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,10 +9,10 @@ public class EventSidebar : MonoBehaviour
     [SerializeField] private GameObject nextExercise;
     [SerializeField] private Exercise[] exercises;
     [SerializeField] private GameObject endText;
-    
-    private Image _previousSprite;
     private Image _currentSprite;
     private Image _nextSprite;
+
+    private Image _previousSprite;
 
     private void Awake()
     {
@@ -23,6 +20,7 @@ public class EventSidebar : MonoBehaviour
         _currentSprite = currentExercise.GetComponent<Image>();
         _nextSprite = nextExercise.GetComponent<Image>();
     }
+
     private void Start()
     {
         _previousSprite.enabled = false;
@@ -43,21 +41,22 @@ public class EventSidebar : MonoBehaviour
         _previousSprite.enabled = true;
         _previousSprite.sprite = exercises[0].ExerciseImage;
 
-        for (int i = 1; i < exercises.Length; i++)
+        for (var i = 1; i < exercises.Length; i++)
         {
             _currentSprite.sprite = exercises[i].ExerciseImage;
-            if (i + 1 > exercises.Length-1)
+            if (i + 1 > exercises.Length - 1)
             {
                 _nextSprite.enabled = false;
                 break;
             }
-            _nextSprite.sprite = exercises[i+1].ExerciseImage;
+
+            _nextSprite.sprite = exercises[i + 1].ExerciseImage;
             yield return new WaitForSeconds(exercises[i].DurationTime);
             _previousSprite.sprite = exercises[i].ExerciseImage;
         }
-        
-        yield return new WaitForSeconds(exercises[exercises.Length-1].DurationTime);
-        _previousSprite.sprite = exercises[exercises.Length-1].ExerciseImage;
+
+        yield return new WaitForSeconds(exercises[exercises.Length - 1].DurationTime);
+        _previousSprite.sprite = exercises[exercises.Length - 1].ExerciseImage;
         _currentSprite.enabled = false;
         endText.SetActive(true);
     }

@@ -3,12 +3,15 @@ using UnityEngine;
 
 public static class ImageUtils
 { 
-    public static byte[] Base64ToByteArray(string base64String)
-    {
-        return System.Convert.FromBase64String(base64String);
-    }
+    public static string Texture2DToBase64(byte[] textureBytes)
+    { 
+        // Convert the byte array to a Base64 string
+        string base64String = Convert.ToBase64String(textureBytes);
 
-    public static Texture2D Base64ToTexture(string base64String)
+        return base64String; 
+    }
+    
+    public static Texture2D Base64ToTexture2D(string base64String)
     {
         if (string.IsNullOrEmpty(base64String))
         {
@@ -33,8 +36,8 @@ public static class ImageUtils
             return null;
         }
 
-        // Initial size is fine as Unity will resize it during LoadImage
-        Texture2D texture = new(1, 1);  
+        // Create a new Texture2D with initial dimensions (1, 1) as it will be resized by LoadImage
+        Texture2D texture = new Texture2D(1, 1);
         bool isLoaded = texture.LoadImage(imageBytes);
 
         if (!isLoaded)
@@ -45,4 +48,5 @@ public static class ImageUtils
 
         return texture;
     }
+
 }
