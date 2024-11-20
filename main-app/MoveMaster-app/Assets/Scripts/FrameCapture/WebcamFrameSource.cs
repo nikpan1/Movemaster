@@ -1,58 +1,89 @@
+using System;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using OpenCvSharp;
+
 
 public class WebcamFrameSource : IFrameSource
 {
-    private WebCamTexture _webcam;
-    private UnityEvent<Texture2D> _onNewFrameTriggerTexture;
- 
+    private VideoCapture _capture;
+    private Texture2D _texture;
+    
+    private bool _isInitialized = false;
+    private bool _isCapturing = false; 
+    
+    private const int Framerate = 20;
+    
     public void SetupCapture()
     {
-        if (WebCamTexture.devices.Length == 0)
-        {
-            Debug.LogError("No webcam devices found.");
-            return;
-        }
-        // @TODO: Probably will change accordingly to TASK-30
-        string selectedDevice = WebCamTexture.devices[0].name;
-        _webcam = new WebCamTexture(selectedDevice);
+        Task.Run(() => { 
+            Debug.Log("Initializing WebcamFrameSource. Please wait...");
+            // @TODO: TASK-30 - `0` selects the default camera. Should be changed
+            _capture = new VideoCapture(0);
+
+            if (!_capture.IsOpened())
+            {
+                throw new Exception("WebcamFrameSource is not initialized.");
+            }
+
+            _isInitialized = true;
+            Debug.Log("Initializing WebcamFrameSource. Ended :)");
+        });
     }
 
     public void CleanupCapture()
     {
-        if (_webcam == null) return;
+        _isCapturing = false;
         
-        _webcam.Stop();
-        _webcam = null;
+        // Release VideoCapture resources.
+        _capture?.Release();
+        _capture?.Dispose();
+        _capture = null;
+        
+        _texture = null;
     }
 
-    public IEnumerator RunCapture(UnityEvent<Texture2D> trigger)
+    public IEnumerator RunCapture(UnityEvent<Texture2D> triggers)
     {
-        _onNewFrameTriggerTexture = trigger;
+        yield return new WaitUntil(() => _isInitialized);
+        
+        // Create a Texture2D with dimensions matching the captured frames.
+        _texture = new Texture2D(_capture.FrameWidth, _capture.FrameHeight, TextureFormat.RGB24, false); 
 
-        if (_webcam == null)
+        _isCapturing = true;
+        
+        Mat latestFrame = new Mat();
+        while (_isCapturing && _capture.IsOpened())
         {
-            Debug.LogError("Webcam not initialized. Call SetupCapture first.");
-            yield break;
+            if (!_capture.Read(latestFrame) || latestFrame.Empty())
+            {
+                Debug.LogWarning("No frame captured.");
+                break;
+            }
+
+            MatToTexture(latestFrame, _texture);
+            triggers?.Invoke(_texture);
+ 
+            yield return new WaitForSeconds(1 / Framerate);
         }
 
-        _webcam.Play();
-
-        // Start capturing frames
-        while (_webcam.isPlaying)
+        if (_isCapturing)
         {
-            Texture2D frame = GetTextureFromWebcam();
-            _onNewFrameTriggerTexture?.Invoke(frame);
-            yield return null;
+            throw new Exception("Capturing frames failed.");
         }
+        
+        latestFrame.Release();
     }
 
-    private Texture2D GetTextureFromWebcam()
+    private void MatToTexture(Mat mat, Texture2D texture)
     {
-        Texture2D frame = new Texture2D(_webcam.width, _webcam.height);
-        frame.SetPixels(_webcam.GetPixels());
-        frame.Apply();
-        return frame;
+        // Convert the Mat to byte array.
+        byte[] byteArray = mat.ImEncode(".jpg");
+
+        // Load the byte array into the texture.
+        texture.LoadImage(byteArray);
     }
 }

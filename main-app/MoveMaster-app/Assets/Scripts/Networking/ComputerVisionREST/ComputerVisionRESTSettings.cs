@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class ComputerVisionRESTSettings
 {
     public float min_detection_confidence = 0.7f;
@@ -11,4 +12,3 @@ public class ComputerVisionRESTSettings
         return JsonUtility.ToJson(this);
     }
 }
-

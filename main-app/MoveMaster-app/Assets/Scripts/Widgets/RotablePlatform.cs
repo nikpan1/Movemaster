@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class RotablePlatform : MonoBehaviour
@@ -6,18 +5,15 @@ public class RotablePlatform : MonoBehaviour
     [SerializeField] private float speed = 100;
     [SerializeField] private GameObject[] objectsOnPlatform;
     [SerializeField] private Camera camera;
-   
-    private bool _isRotating;
-    private float _startMousePosition;
     private float _currentMousePosition;
+
+    private bool _isRotating;
     private float _mouseMovement;
+    private float _startMousePosition;
 
     private void Start()
     {
-        foreach (GameObject obj in objectsOnPlatform)
-        {
-            obj.transform.SetParent(gameObject.transform);
-        }
+        foreach (var obj in objectsOnPlatform) obj.transform.SetParent(gameObject.transform);
     }
 
     private void Update()
@@ -25,7 +21,7 @@ public class RotablePlatform : MonoBehaviour
         // Idk which version is better
         //camera.fieldOfView += -Input.GetAxis("Mouse ScrollWheel") * 50000 * Time.deltaTime;
         camera.fieldOfView += -Input.GetAxis("Mouse ScrollWheel") * speed;
-        
+
         if (Input.GetMouseButtonDown(0))
         {
             _isRotating = true;
@@ -36,10 +32,7 @@ public class RotablePlatform : MonoBehaviour
             _isRotating = false;
         }
 
-        if (_isRotating)
-        {
-            RotatePlatform();
-        }
+        if (_isRotating) RotatePlatform();
     }
 
     private void RotatePlatform()

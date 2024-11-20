@@ -1,26 +1,30 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MediaViewer : MonoBehaviour
 {
-    private Image _image;
-    
-    private RectTransform _rectTransform;
+    private RawImage _rawImage;
 
+    private Sprite _sprite;
+    private Rect _rect;
+    private Vector2 _pivot = new Vector2(0.5f, 0.5f);
+    
     private void Awake()
     {
-        _image = GetComponent<Image>();
-        _rectTransform = GetComponent<RectTransform>();
+        _rawImage = GetComponent<RawImage>();
     }
 
-    public void DisplayFrame(Texture2D texture)
-    { 
-        // Create the sprite from the texture
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        _image.sprite = sprite;
+    public void DisplayFrame(Texture texture)
+    {
+        Texture2D texture2D = texture as Texture2D;
+        if (texture2D == null)
+        {
+            Debug.LogError("The provided texture is not a Texture2D.");
+            return;
+        }
 
-        float aspectRatio = (float)texture.width / texture.height;
-        _rectTransform.sizeDelta = new Vector2(_rectTransform.sizeDelta.x, _rectTransform.sizeDelta.x / aspectRatio);
+        _rect = new Rect(0, 0, texture2D.width, texture2D.height);
+        _sprite = Sprite.Create(texture2D, _rect, _pivot);
+        _rawImage.texture = _sprite.texture;
     }
 }

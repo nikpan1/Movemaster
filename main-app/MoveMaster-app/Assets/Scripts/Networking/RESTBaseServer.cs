@@ -1,62 +1,56 @@
-using UnityEngine;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System;
-using System.Net;
-using System.IO;
-using System.Text;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
+using UnityEngine;
 
 public class RestBaseServer : IDisposable
 {
-    #region Endpoint Management
-    private delegate string EndpointFunction(string input);
-    private ConcurrentDictionary<RESTEndpoint, EndpointFunction> _endpointActions = new();
-
-    private class EndpointQueue
-    {
-        public ConcurrentQueue<HttpListenerContext> Queue = new();
-        public bool IsProcessing = false;
-    }
-
-    private readonly ConcurrentDictionary<string, EndpointQueue> _endpointQueues = new();
-    #endregion
-
     #region Server Configuration
+
     private const string ServerUrl = "http://localhost:7000/";
 
     private readonly HttpClient _client = new();
     private readonly HttpListener _listener = new();
     private static readonly SemaphoreSlim RequestConcurrencySemaphore = new(8); // renamed for clarity
 
-    private bool _isListenerRunning = false;
+    private bool _isListenerRunning;
+
     #endregion
 
-    #region Logging Utilities
+    #region Endpoint Management
 
-    private void Log(string message) => Debug.Log("[REST Base Server] : " + message);
-    private void LogError(string message) => Debug.LogError("[REST Base Server] : " + message);
+    private delegate string EndpointFunction(string input);
+
+    private readonly ConcurrentDictionary<RESTEndpoint, EndpointFunction> _endpointActions = new();
+
+    private class EndpointQueue
+    {
+        public bool IsProcessing;
+        public readonly ConcurrentQueue<HttpListenerContext> Queue = new();
+    }
+
+    private readonly ConcurrentDictionary<string, EndpointQueue> _endpointQueues = new();
     #endregion
-    
     
     public RestBaseServer()
     {
         if (!HttpListener.IsSupported)
-        {
             throw new PlatformNotSupportedException("This platform does not support HTTP listeners.");
-        }
 
         RegisterAction("/healthcheck", HttpMethod.Get, HandleHealthCheck);
-        
+
         _listener.Prefixes.Add(ServerUrl);
         _client.Timeout = TimeSpan.FromSeconds(10);
-        _listener.Start(); 
-        
+        _listener.Start();
+
         _isListenerRunning = true;
     }
-    
+
     public void StartListener()
     {
         Task.Run(ListenForRequests);
@@ -71,17 +65,16 @@ public class RestBaseServer : IDisposable
     private async Task ListenForRequests()
     {
         while (_isListenerRunning && _listener.IsListening)
-        {
             try
             {
-                HttpListenerContext context = await _listener.GetContextAsync();
-                string endpoint = context.Request.Url.AbsolutePath;
+                var context = await _listener.GetContextAsync();
+                var endpoint = context.Request.Url.AbsolutePath;
                 var queue = _endpointQueues.GetOrAdd(endpoint, _ => new EndpointQueue());
 
                 lock (queue)
                 {
                     // Clear the queue and add the new request
-                    while (queue.Queue.TryDequeue(out _));
+                    while (queue.Queue.TryDequeue(out _)) ;
                     queue.Queue.Enqueue(context);
 
                     if (!queue.IsProcessing)
@@ -93,9 +86,8 @@ public class RestBaseServer : IDisposable
             }
             catch (ObjectDisposedException) when (!_isListenerRunning)
             {
-                Log($"Listener has been closed gracefully.");
+                Log("Listener has been closed gracefully.");
             }
-        }
     }
 
     private async Task ProcessQueue(string endpoint)
@@ -104,7 +96,6 @@ public class RestBaseServer : IDisposable
             return;
 
         while (queue.Queue.TryDequeue(out var context))
-        {
             try
             {
                 await HandleRequest(context);
@@ -116,7 +107,6 @@ public class RestBaseServer : IDisposable
                 context.Response.StatusCode = 500;
                 context.Response.Close();
             }
-        }
 
         lock (queue)
         {
@@ -124,14 +114,14 @@ public class RestBaseServer : IDisposable
         }
     }
 
-    
+
     private async Task HandleRequest(HttpListenerContext context)
     {
-        HttpListenerRequest request = context.Request;
-        string requestContent = await ReadRequestContent(request);
+        var request = context.Request;
+        var requestContent = await ReadRequestContent(request);
         RESTEndpoint endpointType = new(request.Url.AbsolutePath, request.HttpMethod);
-        
-        string responseContent = CallEndpoint(endpointType, requestContent);
+
+        var responseContent = CallEndpoint(endpointType, requestContent);
         await SendResponse(context.Response, responseContent);
     }
 
@@ -143,13 +133,13 @@ public class RestBaseServer : IDisposable
 
     private async Task SendResponse(HttpListenerResponse response, string responseString)
     {
-        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+        var buffer = Encoding.UTF8.GetBytes(responseString);
         response.ContentLength64 = buffer.Length;
 
-        using Stream outputStream = response.OutputStream;
+        using var outputStream = response.OutputStream;
         await outputStream.WriteAsync(buffer, 0, buffer.Length);
     }
-    
+
     public async Task<string> SendRequest(RESTEndpoint endpoint, string url, string content = null)
     {
         await RequestConcurrencySemaphore.WaitAsync();
@@ -161,11 +151,9 @@ public class RestBaseServer : IDisposable
             requestMessage.Method = endpoint.Method;
 
             if (IsRequestTypeSupportingBody(endpoint, content))
-            {
                 requestMessage.Content = new StringContent(content, Encoding.UTF8, "application/json");
-            }
 
-            HttpResponseMessage response = await _client.SendAsync(requestMessage).ConfigureAwait(false);
+            var response = await _client.SendAsync(requestMessage).ConfigureAwait(false);
             return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         catch (ObjectDisposedException) when (!_isListenerRunning)
@@ -190,8 +178,6 @@ public class RestBaseServer : IDisposable
 
     public void RegisterAction(string endpointUrl, HttpMethod method, Func<string, string> func)
     {
-        Log($"Endpoint added: {endpointUrl} ({method})"); 
-        
         _endpointActions.AddOrUpdate(
             new RESTEndpoint(endpointUrl, method),
             _ => new EndpointFunction(func),
@@ -201,23 +187,38 @@ public class RestBaseServer : IDisposable
 
     private string CallEndpoint(RESTEndpoint endpointType, string input)
     {
-        Log($"Endpoint called: {endpointType.Url} ({endpointType.Method})");
-
         if (!_endpointActions.TryGetValue(endpointType, out var endpointDelegates))
-        {
             throw new Exception($"Endpoint was not initialized: {endpointType.Url} ({endpointType.Method})");
-        }
 
         string response = null;
-        foreach (EndpointFunction endpoint in endpointDelegates.GetInvocationList())
-        {
+        foreach (EndpointFunction endpoint in
+                 endpointDelegates.GetInvocationList())
             response = endpoint(input) ?? response; // if the endpoint call returns a non-null value, then store it as response, but don't override it
-        }
 
         return response;
     }
 
+    private string HandleHealthCheck(string input)
+    {
+        return JsonUtility.ToJson(new { status = "OK" });
+    }
+    
+    #region Logging Utilities
+
+    private void Log(string message)
+    {
+        //Debug.Log("[REST Base Server] : " + message);
+    }
+
+    private void LogError(string message)
+    {
+        //Debug.LogError("[REST Base Server] : " + message);
+    }
+
+    #endregion
+
     #region Dispose pattern implementation
+
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
@@ -232,11 +233,6 @@ public class RestBaseServer : IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    
-    #endregion
 
-    private string HandleHealthCheck(string input)
-    {
-        return JsonUtility.ToJson(new { status = "OK" });
-    }
+    #endregion
 }

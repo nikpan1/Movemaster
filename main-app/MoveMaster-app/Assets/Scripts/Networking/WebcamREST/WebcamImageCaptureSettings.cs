@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class WebcamImageCaptureRESTSettings
 {
     // @TODO: Probably will change accordingly to TASK-30
@@ -14,4 +13,3 @@ public class WebcamImageCaptureRESTSettings
         return JsonUtility.ToJson(this);
     }
 }
- 

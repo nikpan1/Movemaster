@@ -1,15 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class FrameCaptureManager : MonoBehaviour
 {
-    private IFrameSource _source;
-    public bool shouldRunLocally = false;
-    
+    public bool shouldRunLocally;
+
     public UnityEvent<Texture2D> onNewFrameTrigger;
-    
+    private IFrameSource _source;
+
     private void Start()
     {
         _source = shouldRunLocally ? new WebcamFrameSource() : new ServerFrameSource();
@@ -19,6 +17,6 @@ public class FrameCaptureManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        _source.CleanupCapture();
+        _source?.CleanupCapture();
     }
 }
