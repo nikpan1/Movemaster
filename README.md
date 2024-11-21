@@ -19,9 +19,6 @@
 ├── /main-app
 │   └── /MoveMaster-app          # Main Unity application project file
 │
-├── /mocker
-│   └── /src			         # Python mocker app
-│
 ├── /cv-server
 │   └── /python-server         # Python server implementation
 │
@@ -41,9 +38,9 @@
 
 ### Running the Application
 - **Main Unity App:** Launch the Unity project and run the scene to start the game.
-- **Server:** Navigate to the `/server` directory and run the Python server:
+- **Server:** Navigate to the `/cv-server` directory and run the Python server:
   ```bash
-  python server.py
+  python3 Application.py
   ```
 
 ## Documentation
@@ -57,4 +54,3 @@ Detailed documentation is available in the `/docs` folder and `readme.md` of eve
 - Dawid Nowicki
 
 Feel free to contact us if you have any questions or suggestions for the project.
-```
