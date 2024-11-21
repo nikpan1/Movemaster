@@ -46,7 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Exercise.cs" />
+    <Compile Include="Assets\Scripts\Stickman\IKFabrik.cs" />
     <Compile Include="Assets\Scripts\EventSidebar.cs" />
+    <Compile Include="Assets\ScriptableObjects\WebcamImageCapture\FrameReceiver.cs" />
+    <Compile Include="Assets\Scripts\Stickman\MakeExercise.cs" />
+    <Compile Include="Assets\Scripts\Base64Conversions\b64ToImg.cs" />
+    <Compile Include="Assets\Scripts\Base64Conversions\imgToB64.cs" />
+    <Compile Include="Assets\Scripts\RotablePlatform.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
