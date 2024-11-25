@@ -6,6 +6,8 @@ using NetMQ;
 using NetMQ.Sockets;
 using UnityEngine;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
@@ -31,6 +33,9 @@ public class ComputerVisionIPCHandler : MonoBehaviour, IDisposable
     private DateTime _lastRequestTime = DateTime.MinValue;
     private readonly TimeSpan _minInterval = TimeSpan.FromMilliseconds(333);
     #endregion
+
+    private int _width;
+    private int _height;
     
     [SerializeField] private Vector3[] latestResult;
 
@@ -63,6 +68,8 @@ public class ComputerVisionIPCHandler : MonoBehaviour, IDisposable
 
         // Convert the image to bytes, it needs to be done on the main Thread
         var textureBytes = image.EncodeToPNG();
+        _width = image.width;
+        _height = image.height;
         
         // Start processing the image asynchronously
         _ = Task.Run(() => ProcessImageAsync(textureBytes));
@@ -95,18 +102,7 @@ public class ComputerVisionIPCHandler : MonoBehaviour, IDisposable
                     //Debug.Log("ProcessImageAsync: Response ignored due to cancellation.");
                     return;
                 }
- 
-                ComputerVisionIPCData pointData = JsonConvert.DeserializeObject<ComputerVisionIPCData>(result);
-                var temppointsArray = new Vector3[pointData.points.Length];
-                for (int i = 0; i < pointData.points.Length; i++)
-                {
-                    temppointsArray[i] = new Vector3(
-                        (float)pointData.points[i][0],
-                        (float)pointData.points[i][1],
-                        (float)pointData.points[i][2] 
-                    );
-                }
-                latestResult = temppointsArray;
+                ExtractData(result);
             }
         }
         catch (OperationCanceledException)
@@ -121,6 +117,31 @@ public class ComputerVisionIPCHandler : MonoBehaviour, IDisposable
         {
             _semaphore.Release();
         }
+    }
+
+    private void ExtractData(string result)
+    {
+        ComputerVisionIPCData pointData = JsonConvert.DeserializeObject<ComputerVisionIPCData>(result);
+        var temppointsArray = new Vector3[pointData.points.Length];
+        for (int i = 0; i < pointData.points.Length; i++)
+        {
+            temppointsArray[i] = new Vector3(
+                (float)pointData.points[i][0],
+                (float)pointData.points[i][1],
+                (float)pointData.points[i][2] 
+            );
+        }
+                
+        var lefthip = temppointsArray[23];
+        var righthip = temppointsArray[24];
+        var centerpoint = (lefthip + righthip) / 2f;
+                
+        for (int i = 0; i < pointData.points.Length; i++)
+        {
+            temppointsArray[i] -= centerpoint;
+        }
+                
+        latestResult = temppointsArray;
     }
 
     private void CleanupIpcHandler()
