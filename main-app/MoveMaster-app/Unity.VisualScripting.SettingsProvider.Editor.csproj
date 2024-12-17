@@ -329,9 +329,6 @@
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.collab-proxy@2.5.2\Lib\Editor\PlasticSCM\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="NetMQ">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NetMQ.4.0.1.13\lib\netstandard2.1\NetMQ.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Plastic.Newtonsoft.Json">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.collab-proxy@2.5.2\Lib\Editor\PlasticSCM\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -341,32 +338,14 @@
     <Reference Include="Unity.VisualScripting.IonicZip">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.visualscripting@1.9.4\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.visualscripting@1.9.4\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="NaCl">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\NaCl.Net.0.1.13\lib\netstandard2.1\NaCl.dll</HintPath>
     </Reference>
     <Reference Include="NuGetForUnity.PluginAPI">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.github-glitchenzo.nugetforunity@0d0e4af9c7\Editor\PluginAPI\NuGetForUnity.PluginAPI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.visualscripting@1.9.4\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Security.Principal.Windows">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenCvSharp">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\OpenCvSharp4.4.10.0.20241108\lib\netstandard2.1\OpenCvSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="AsyncIO">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\AsyncIO.0.1.69\lib\netstandard2.0\AsyncIO.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Assets\Packages\Newtonsoft.Json.13.0.3\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>C:\Users\nikod\Documents\GitHub\Movemaster\main-app\MoveMaster-app\Library\PackageCache\com.unity.ext.nunit@1.0.6\net35\unity-custom\nunit.framework.dll</HintPath>
