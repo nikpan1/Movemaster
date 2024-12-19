@@ -54,7 +54,7 @@ public class settingsPanel : MonoBehaviour
         _displayMode.value = Screen.fullScreen ? 0 : 1;
     }
  
-    public void Sound(float volume)
+    public void SetSound(float volume)
     {
         _audioMixer.SetFloat("Volume", volume);
         _soundLevel.text = $"{Mathf.Round(volume * 100)}%";
