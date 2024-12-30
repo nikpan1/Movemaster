@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Net.Http;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,7 +15,9 @@ public class ServerFrameSource : IFrameSource
     private Texture2D _latestFrame;
 
     private UnityEvent<Texture2D> _onNewFrameTriggerTexture;
-
+    private UnityEvent<ExerciseInference> _triggersExerciseInference; 
+    
+    
     public void SetupCapture()
     {
         _baseServer = new RestBaseServer();
@@ -36,9 +38,11 @@ public class ServerFrameSource : IFrameSource
         _baseServer.StopListener();
     }
 
-    public IEnumerator RunCapture(UnityEvent<Texture2D> triggers)
+    public IEnumerator RunCapture(UnityEvent<Texture2D> triggersTexture2D, UnityEvent<ExerciseInference> triggersExerciseInference)
     {
-        _onNewFrameTriggerTexture = triggers;
+        _onNewFrameTriggerTexture = triggersTexture2D;
+        _triggersExerciseInference = triggersExerciseInference;
+        
         RESTEndpoint getFrame = new("/new_frame", HttpMethod.Get);
         while (_isCapturing)
         {
@@ -64,8 +68,13 @@ public class ServerFrameSource : IFrameSource
         var request = JsonUtility.FromJson<ServerFrameInputStructure>(input.Replace("\\\"", "\""));
         var base64String = request.base64_image.Trim('"');
         _latestFrame = ImageUtils.Base64ToTexture2D(base64String);
+        
+        var latestPredictedClass = request.latest_predicted_class.Trim('"');
+        var latestPredictedConfidence = request.latest_predicted_confidence;
+        ExerciseInference ex = new ExerciseInference(latestPredictedClass, latestPredictedConfidence);
 
         _onNewFrameTriggerTexture?.Invoke(_latestFrame);
+        _triggersExerciseInference?.Invoke(ex);
     }
 
     private void SendShutdown()

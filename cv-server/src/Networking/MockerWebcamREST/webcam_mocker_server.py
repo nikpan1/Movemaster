@@ -1,13 +1,11 @@
-import json
 import logging
 import os
 import signal
-import threading
+
 import httpx
-from concurrent.futures import ThreadPoolExecutor
 import uvicorn
 from fastapi import FastAPI
-import numpy as np
+
 from Networking.Base64.base64_conversions import *
 
 
@@ -54,7 +52,9 @@ class MockerCaptureCameraServer:
 
         @self.app.get("/new_frame")
         async def capture_and_send():
-            return {"base64_image": image_to_base64(self.mocker.current_frame)}
+            return {"base64_image": image_to_base64(self.mocker.current_frame),
+                    "latest_predicted_class": self.mocker.latest_predicted_class,
+                    "latest_predicted_confidence": self.mocker.latest_predicted_confidence}
 
         @self.app.on_event("shutdown")
         async def shutdown_event():

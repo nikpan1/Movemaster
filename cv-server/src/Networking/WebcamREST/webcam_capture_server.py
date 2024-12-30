@@ -1,11 +1,13 @@
 import os
 import signal
 import httpx
+import torch
 import uvicorn
 import logging
 
 from fastapi import FastAPI, BackgroundTasks
 
+from ComputerVision.PoseEstimation.ExerciseClassification import ExerciseRecognition, Args
 from Networking.Base64.base64_conversions import *
 from Networking.WebcamREST.webcam_video_capture import WebcamVideoCapture
 import asyncio
@@ -15,6 +17,13 @@ class WebcamCaptureServer:
         self.UNITY_SERVER_URL = f"http://{unity_server_address}:{unity_port_number}"
 
         self.IS_UNITY_RUNNING = False
+
+        args = Args()
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.exercise_recognition = ExerciseRecognition(model_path=r"ComputerVision\PoseEstimation\model.pth",
+                                                        repetitiveness=1, device=device, args=args)
+        self.latest_predicted_class = "non_activity"
+        self.latest_predicted_confidence = 0
 
         self.cap = WebcamVideoCapture()
         self.cap.set(device_id)
@@ -44,10 +53,14 @@ class WebcamCaptureServer:
         @self.app.post("/capture_and_send")
         async def capture_and_send():
             ret, frame = self.cap.get_frame()
+            self.latest_predicted_class, self.latest_predicted_confidence = \
+                self.exercise_recognition.recognize(frame)
             if not ret:
                 raise Exception("Failed to capture frame")
 
-            return image_to_base64(frame)
+            return {"base64_image": image_to_base64(frame),
+                    "latest_predicted_class": self.latest_predicted_class,
+                    "latest_predicted_confidence": self.latest_predicted_confidence}
 
         @self.app.post("/shutdown")
         async def shutdown(background_tasks: BackgroundTasks):

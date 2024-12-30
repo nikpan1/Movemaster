@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using UnityEngine;
 using UnityEngine.Events;
 // using OpenCvSharp;
@@ -46,7 +46,7 @@ public class WebcamFrameSource : IFrameSource
         _texture = null;
     }
 
-    public IEnumerator RunCapture(UnityEvent<Texture2D> triggers)
+    public IEnumerator RunCapture(UnityEvent<Texture2D> triggersTexture2D, UnityEvent<ExerciseInference> triggersExerciseInference)
     {
         yield return new WaitUntil(() => _isInitialized);
         

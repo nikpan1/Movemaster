@@ -1,13 +1,10 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using UnityEngine;
 // using AsyncIO;
 // using NetMQ;
 // using NetMQ.Sockets;
 // using Newtonsoft.Json;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 
 public class ComputerVisionIPCHandler : MonoBehaviour//, IDisposable
