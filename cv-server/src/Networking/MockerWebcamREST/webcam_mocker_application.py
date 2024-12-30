@@ -6,7 +6,9 @@ from tkinter import font as tk_font
 
 import PIL.Image
 import PIL.ImageTk
+import torch
 
+from ComputerVision.PoseEstimation.ExerciseClassification import Args, ExerciseRecognition
 from Networking.MockerWebcamREST.mocker_video_capture import MockerVideoCapture
 from Networking.MockerWebcamREST.webcam_mocker_server import MockerCaptureCameraServer
 
@@ -14,6 +16,13 @@ from Networking.MockerWebcamREST.webcam_mocker_server import MockerCaptureCamera
 class WebcamMockerApplication(tk.Tk):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
+        args = Args()
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.exercise_recognition = ExerciseRecognition(model_path=r"ComputerVision\PoseEstimation\model.pth",
+                                                        repetitiveness=1, device=device, args=args)
+        self.latest_predicted_class = "non_activity"
+        self.latest_predicted_confidence = 0
 
         self.video_capture = MockerVideoCapture()
         self.playback_resolution = (640, 480)
@@ -41,8 +50,6 @@ class WebcamMockerApplication(tk.Tk):
         self.bottom_frame.grid(row=1, column=0, padx=5, pady=5)
 
         helv36 = tk_font.Font(family='Helvetica', size=16, weight=tk_font.BOLD)
-        self.toggle_webcam_btn = tk.Button(self.bottom_frame, text='WEBCAM', command=self.toggle_webcam, font=helv36,
-                                           background='#7E7E7E')
         self.open_file_btn = tk.Button(self.bottom_frame, text='OPEN', command=self.select_file, font=helv36)
         self.play_btn = tk.Button(self.bottom_frame, text='PLAY', command=self.play_video, font=helv36)
         self.stop_btn = tk.Button(self.bottom_frame, text='STOP', command=self.stop_video, font=helv36)
@@ -51,7 +58,6 @@ class WebcamMockerApplication(tk.Tk):
                                       height=self.playback_resolution[1], background='black')
 
         self.video_canvas.grid(row=0, column=0)
-        self.toggle_webcam_btn.grid(row=0, column=0, padx=5, pady=5, ipadx=10)
         self.open_file_btn.grid(row=0, column=1, padx=5, pady=5, ipadx=10)
         self.replay_btn.grid(row=0, column=2, padx=5, pady=5, ipadx=10)
         self.play_btn.grid(row=0, column=3, padx=5, pady=5, ipadx=10)
@@ -62,6 +68,8 @@ class WebcamMockerApplication(tk.Tk):
             self.ret, frame = self.video_capture.get_frame()
             if self.ret:
                 self.current_frame = frame
+                self.latest_predicted_class, self.latest_predicted_confidence =\
+                    self.exercise_recognition.recognize(frame)
                 image = PIL.Image.fromarray(frame)
                 image = image.resize(self.playback_resolution, PIL.Image.Resampling.LANCZOS)
                 self.photo = PIL.ImageTk.PhotoImage(image=image)
@@ -74,7 +82,6 @@ class WebcamMockerApplication(tk.Tk):
 
     def toggle_webcam(self):
         if self.webcam:
-            self.toggle_webcam_btn.config(background="#7E7E7E")
             self.replay_btn["state"] = "normal"
             self.open_file_btn["state"] = "normal"
             self.play_btn["state"] = "normal"
@@ -82,7 +89,6 @@ class WebcamMockerApplication(tk.Tk):
             self.video_capture.reset()
             self.webcam = False
         else:
-            self.toggle_webcam_btn.config(background="red")
             self.replay_btn["state"] = "disabled"
             self.open_file_btn["state"] = "disabled"
             self.play_btn["state"] = "disabled"

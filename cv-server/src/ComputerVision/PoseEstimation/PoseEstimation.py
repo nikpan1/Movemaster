@@ -1,6 +1,9 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+from collections import deque
+
+import torch
 
 
 class PoseLandmarkExtractor:
@@ -16,19 +19,45 @@ class PoseLandmarkExtractor:
             min_tracking_confidence=min_tracking_confidence
         )
 
+        self.landmark_history = deque(maxlen=150)
+
+    def get_landmarks_history(self):
+        return self.landmark_history
+
+    def is_full(self):
+        return len(self.landmark_history) == self.landmark_history.maxlen
+
+    @staticmethod
+    def convert_history_to_tensor(landmark_history: deque, device) -> torch.Tensor:
+        """
+        Converts the landmark history into a PyTorch tensor of shape (1, 2, 150, 18).
+
+        :param landmark_history: A deque containing the last 150 frames of landmarks, each as a NumPy array (18, 2).
+        :return: A PyTorch tensor of shape (1, 2, 150, 18).
+        """
+        # Ensure the history contains exactly 150 entries
+        if len(landmark_history) < 150:
+            raise ValueError("Landmark history must contain exactly 150 entries.")
+
+        # Stack the history into a NumPy array of shape (150, 18, 2)
+        history_array = np.stack(landmark_history, axis=0)  # Shape: (150, 18, 2)
+
+        # Permute and reshape into (1, 2, 150, 18) as required
+        tensor = torch.from_numpy(history_array).permute(2, 0, 1).unsqueeze(0).float().to(device)  # Shape: (1, 2, 150, 18)
+
+        return tensor
+
     def extract_landmarks(self, frame: cv2.Mat) -> np.ndarray:
         """
         Process the given frame to detect pose landmarks and return a fixed-size array of (33 landmarks * 3 values),
         where each landmark contains [x, y, z] coordinates.
 
         :param frame: Input frame in the form of a cv2.Mat.
-        :return: A tuple containing:
-            - xyz: A NumPy array of shape (33, 3) where each row represents [x, y, z].
-            - fixed_size_array: A NumPy array of shape (33, 3) where each row represents [x, y, z].
+        :return: A NumPy array of shape (33, 3) where each row represents [x, y, z].
         """
         xyz = np.zeros((33, 3), dtype=np.float32)
 
-        results = self.mp_pose.process(frame)
+        results = self.mp_pose.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
         if results.pose_landmarks is not None:
             height, width, _ = frame.shape
@@ -41,7 +70,10 @@ class PoseLandmarkExtractor:
                 xyz[i, 1] = landmark.y * height  # y-coordinate
                 xyz[i, 2] = landmark.z  # z-coordinate (depth from the camera)
 
-        return xyz
+        landmarks = self.mediapipe_to_openpose(xyz)
+        self.landmark_history.append(landmarks)
+
+        return landmarks
 
     def draw_landmarks(self, image: cv2.Mat, landmarks: np.ndarray):
         """
@@ -51,31 +83,52 @@ class PoseLandmarkExtractor:
         :param landmarks: NumPy array of shape (33, 3), representing the pose landmarks.
         """
         for landmark in landmarks:
-            x, y, visibility = landmark
+            x, y = landmark
 
-            if visibility == 1.0:
+            if x > 0 and y > 0:
                 cv2.circle(image, (int(x), int(y)), 5, (0, 255, 0), -1)
 
         return image
 
+    def mediapipe_to_openpose(self, mediapipe_landmarks: np.ndarray) -> np.ndarray:
+        """
+        Converts MediaPipe pose landmarks (33 keypoints) to OpenPose format (18 keypoints).
 
-def place_on_canvas(image: cv2.Mat) -> cv2.Mat:
-    """
-    Places the input image in the center of a 2x larger canvas.
+        :param mediapipe_landmarks: NumPy array of shape (33, 3) representing MediaPipe landmarks.
+        :return: NumPy array of shape (18, 2) representing OpenPose landmarks.
+        """
+        openpose_landmarks = np.zeros((18, 2), dtype=np.float32)
 
-    :param image: Input image in the form of a cv2.Mat.
-    :return: The larger canvas with the image placed at the center.
-    """
-    height, width, _ = image.shape
+        def avg_points(p1, p2):
+            return (mediapipe_landmarks[p1, :2] + mediapipe_landmarks[p2, :2]) / 2
 
-    # Create a 2x larger empty canvas (black background)
-    canvas = np.zeros((height * 3, width * 3, 3), dtype=np.uint8)
+        mapping = {
+            0: 0,
+            1: (12, 11),  # Average of points 12 and 11
+            2: 12,
+            3: 14,
+            4: 16,
+            5: 11,
+            6: 13,
+            7: 15,
+            8: 24,
+            9: 26,
+            10: 28,
+            11: 23,
+            12: 25,
+            13: 27,
+            14: 5,
+            15: 2,
+            16: 8,
+            17: 7
+        }
 
-    # Calculate the position to place the image at the center
-    y_offset = height // 2
-    x_offset = width // 2
+        for openpose_idx, mediapipe_key in mapping.items():
+            if isinstance(mediapipe_key, tuple):
+                # Calculate average if it's a tuple
+                openpose_landmarks[openpose_idx] = avg_points(*mediapipe_key)
+            else:
+                # Direct mapping
+                openpose_landmarks[openpose_idx] = mediapipe_landmarks[mediapipe_key, :2]
 
-    # Place the input image at the center of the canvas
-    canvas[y_offset:y_offset + height, x_offset:x_offset + width] = image
-
-    return canvas
+        return openpose_landmarks

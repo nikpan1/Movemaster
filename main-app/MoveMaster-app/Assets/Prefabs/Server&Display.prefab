@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 4954265180549179397}
   - component: {fileID: 8210207002566408486}
   - component: {fileID: 4379518233417192316}
-  - component: {fileID: 6608711251935851911}
   - component: {fileID: 532800634937685689}
+  - component: {fileID: 2336889971132730098}
   m_Layer: 5
   m_Name: Server&Display
   m_TagString: Untagged
@@ -103,9 +103,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6608711251935851911}
-        m_TargetAssemblyTypeName: ComputerVisionIPCHandler, Assembly-CSharp
-        m_MethodName: ProcessImage
+  triggersExerciseInference:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2336889971132730098}
+        m_TargetAssemblyTypeName: InferencePreview, Assembly-CSharp
+        m_MethodName: UploadLatestPredictedClass
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -115,19 +118,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6608711251935851911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6886007932675676538}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 490b999ecce66e34193ed1cfecc26000, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  latestResult: []
 --- !u!114 &532800634937685689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,3 +130,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1a160d618b89e46943583ec7d13cfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2336889971132730098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6886007932675676538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f537b969ea7b1f64faefc8ac0965df39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  latestPredictedClass: 
+  latestPredictedConfidence: 0
