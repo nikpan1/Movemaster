@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 
@@ -18,31 +17,28 @@ class MultimodalAutoencoder(nn.Module):
     def __init__(self, f_in, layers, dropout, hidden_units, f_embedding, skel, return_embeddings=False):
         super(MultimodalAutoencoder, self).__init__()
 
+        self.layers = 5
+
         self.skel = skel
         self.return_embeddings = return_embeddings
-        self.layers = layers
         self.f_in = f_in
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
 
         # Encoder
-        if layers == 2:
-            self.enc_fc1 = nn.Linear(f_in, hidden_units, bias=True)
-            self.enc_fc2 = nn.Linear(hidden_units, f_embedding, bias=True)
-        elif layers == 3:
-            self.enc_fc1 = nn.Linear(f_in, hidden_units, bias=True)
-            self.enc_fc2 = nn.Linear(hidden_units, hidden_units, bias=True)
-            self.enc_fc3 = nn.Linear(hidden_units, f_embedding, bias=True)
+        self.enc_fc1 = nn.Linear(f_in, hidden_units, bias=True)
+        self.enc_fc2 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.enc_fc3 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.enc_fc4 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.enc_fc5 = nn.Linear(hidden_units, f_embedding, bias=True)
 
         # Decoder
-        if layers == 2:
-            self.dec_fc1 = nn.Linear(f_embedding, hidden_units, bias=True)
-            self.dec_fc2 = nn.Linear(hidden_units, f_in, bias=True)
-        elif layers == 3:
-            self.dec_fc1 = nn.Linear(f_embedding, hidden_units, bias=True)
-            self.dec_fc2 = nn.Linear(hidden_units, hidden_units, bias=True)
-            self.dec_fc3 = nn.Linear(hidden_units, f_in, bias=True)
+        self.dec_fc1 = nn.Linear(f_embedding, hidden_units, bias=True)
+        self.dec_fc2 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.dec_fc3 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.dec_fc4 = nn.Linear(hidden_units, hidden_units, bias=True)
+        self.dec_fc5 = nn.Linear(hidden_units, f_in, bias=True)
 
     def apply_activation_and_dropout(self, x):
         x = self.relu(x)
@@ -53,42 +49,43 @@ class MultimodalAutoencoder(nn.Module):
         self.skel.set_decode_mode(False)
 
         skel = self.skel(skel)
-        skel_size = (skel.size(0), -1)  # Save batch size and flattened size
+        skel_size = skel.size()
         skel = skel.view(skel.size(0), -1)
 
         x = skel
 
-        if self.layers == 2:
-            x = self.enc_fc1(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.enc_fc2(x)
-            if self.return_embeddings:
-                return x
+        # Encoder: 5 layers
+        x = self.enc_fc1(x)
+        x = self.apply_activation_and_dropout(x)
+        x = self.enc_fc2(x)
 
-            x = self.apply_activation_and_dropout(x)
-            x = self.dec_fc1(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.dec_fc2(x)
+        x = self.apply_activation_and_dropout(x)
+        x = self.enc_fc3(x)
 
-        elif self.layers == 3:
-            x = self.enc_fc1(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.enc_fc2(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.enc_fc3(x)
-            if self.return_embeddings:
-                return x
+        x = self.apply_activation_and_dropout(x)
+        x = self.enc_fc4(x)
 
-            x = self.apply_activation_and_dropout(x)
-            x = self.dec_fc1(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.dec_fc2(x)
-            x = self.apply_activation_and_dropout(x)
-            x = self.dec_fc3(x)
+        x = self.apply_activation_and_dropout(x)
+        x = self.enc_fc5(x)
 
-        skel = x
-        skel = skel.view(skel_size)
+        if self.return_embeddings:
+            return x  # Return embedding if specified
 
+        # Decoder: 5 layers
+        x = self.dec_fc1(x)
+        x = self.apply_activation_and_dropout(x)
+        x = self.dec_fc2(x)
+
+        x = self.apply_activation_and_dropout(x)
+        x = self.dec_fc3(x)
+
+        x = self.apply_activation_and_dropout(x)
+        x = self.dec_fc4(x)
+
+        x = self.apply_activation_and_dropout(x)
+        x = self.dec_fc5(x)
+
+        skel = skel.view(*skel_size)  # Restore original shape for decoding
         self.skel.set_decode_mode(True)
         skel = self.skel(skel)
 

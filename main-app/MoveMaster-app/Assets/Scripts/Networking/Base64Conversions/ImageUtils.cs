@@ -11,7 +11,7 @@ public static class ImageUtils
         return base64String; 
     }
     
-    public static Texture2D Base64ToTexture2D(string base64String)
+    public static Texture2D Base64ToTexture2D(string base64String, Texture2D reusableTexture = null)
     {
         if (string.IsNullOrEmpty(base64String))
         {
@@ -36,9 +36,13 @@ public static class ImageUtils
             return null;
         }
 
-        // Create a new Texture2D with initial dimensions (1, 1) as it will be resized by LoadImage
-        Texture2D texture = new Texture2D(1, 1);
-        bool isLoaded = texture.LoadImage(imageBytes);
+        if (reusableTexture == null)
+        {
+            // Create a new Texture2D if none is provided
+            reusableTexture = new Texture2D(1, 1);
+        }
+
+        bool isLoaded = reusableTexture.LoadImage(imageBytes);
 
         if (!isLoaded)
         {
@@ -46,7 +50,6 @@ public static class ImageUtils
             return null;
         }
 
-        return texture;
+        return reusableTexture;
     }
-
 }
