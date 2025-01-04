@@ -42,20 +42,39 @@ public class ServerFrameSource : IFrameSource
     {
         _onNewFrameTriggerTexture = triggersTexture2D;
         _triggersExerciseInference = triggersExerciseInference;
-        
+
         RESTEndpoint getFrame = new("/new_frame", HttpMethod.Get);
+
         while (_isCapturing)
         {
-            _ = RetrieveNewFrame(getFrame);
+            var startTime = Time.time;
 
-            yield return new WaitForSeconds(1 / Framerate);
+            // Fetch and process a new frame
+            yield return RetrieveNewFrameCoroutine(getFrame);
+
+            // Calculate elapsed time and adjust delay to maintain framerate
+            float elapsedTime = Time.time - startTime;
+            float delay = Mathf.Max(0, (1 / Framerate) - elapsedTime);
+            yield return new WaitForSeconds(delay);
         }
     }
 
-    private async Task RetrieveNewFrame(RESTEndpoint getFrame)
+    private IEnumerator RetrieveNewFrameCoroutine(RESTEndpoint getFrame)
+    {
+        Task<string> fetchTask = RetrieveNewFrame(getFrame);
+
+        while (!fetchTask.IsCompleted)
+            yield return null; // Wait for the task to complete
+
+        if (fetchTask.Result != null)
+            HandleNewFrame(fetchTask.Result);
+    }
+
+
+    private async Task<string> RetrieveNewFrame(RESTEndpoint getFrame)
     {
         var content = await _baseServer.SendRequest(getFrame, WebcamImageCaptureServerUrl, "");
-        HandleNewFrame(content);
+        return content; // Ensure the method explicitly returns a string
     }
 
     private void HandleNewFrame(string input)
@@ -67,7 +86,7 @@ public class ServerFrameSource : IFrameSource
 
         var request = JsonUtility.FromJson<ServerFrameInputStructure>(input.Replace("\\\"", "\""));
         var base64String = request.base64_image.Trim('"');
-        _latestFrame = ImageUtils.Base64ToTexture2D(base64String);
+        _latestFrame = ImageUtils.Base64ToTexture2D(base64String, _latestFrame);
         
         var latestPredictedClass = request.latest_predicted_class.Trim('"');
         var latestPredictedConfidence = request.latest_predicted_confidence;

@@ -17,10 +17,7 @@ class WebcamMockerApplication(tk.Tk):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        args = Args()
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.exercise_recognition = ExerciseRecognition(model_path=r"ComputerVision\PoseEstimation\model.pth",
-                                                        repetitiveness=1, device=device, args=args)
+        self.exercise_recognition = ExerciseRecognition(model_path=r"ComputerVision\PoseEstimation\model.pth")
         self.latest_predicted_class = "non_activity"
         self.latest_predicted_confidence = 0
 

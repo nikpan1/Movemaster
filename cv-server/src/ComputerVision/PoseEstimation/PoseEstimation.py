@@ -19,7 +19,7 @@ class PoseLandmarkExtractor:
             min_tracking_confidence=min_tracking_confidence
         )
 
-        self.landmark_history = deque(maxlen=150)
+        self.landmark_history = deque(maxlen=90)
 
     def get_landmarks_history(self):
         return self.landmark_history
@@ -35,9 +35,6 @@ class PoseLandmarkExtractor:
         :param landmark_history: A deque containing the last 150 frames of landmarks, each as a NumPy array (18, 2).
         :return: A PyTorch tensor of shape (1, 2, 150, 18).
         """
-        # Ensure the history contains exactly 150 entries
-        if len(landmark_history) < 150:
-            raise ValueError("Landmark history must contain exactly 150 entries.")
 
         # Stack the history into a NumPy array of shape (150, 18, 2)
         history_array = np.stack(landmark_history, axis=0)  # Shape: (150, 18, 2)
@@ -68,7 +65,7 @@ class PoseLandmarkExtractor:
 
                 xyz[i, 0] = landmark.x * width  # x-coordinate
                 xyz[i, 1] = landmark.y * height  # y-coordinate
-                xyz[i, 2] = landmark.z  # z-coordinate (depth from the camera)
+                xyz[i, 2] = landmark.z  # z-coordinate
 
         landmarks = self.mediapipe_to_openpose(xyz)
         self.landmark_history.append(landmarks)
@@ -104,7 +101,7 @@ class PoseLandmarkExtractor:
 
         mapping = {
             0: 0,
-            1: (12, 11),  # Average of points 12 and 11
+            1: (12, 11),
             2: 12,
             3: 14,
             4: 16,
@@ -125,10 +122,8 @@ class PoseLandmarkExtractor:
 
         for openpose_idx, mediapipe_key in mapping.items():
             if isinstance(mediapipe_key, tuple):
-                # Calculate average if it's a tuple
                 openpose_landmarks[openpose_idx] = avg_points(*mediapipe_key)
             else:
-                # Direct mapping
                 openpose_landmarks[openpose_idx] = mediapipe_landmarks[mediapipe_key, :2]
 
         return openpose_landmarks
