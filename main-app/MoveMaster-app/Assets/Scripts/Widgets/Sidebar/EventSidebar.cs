@@ -10,6 +10,7 @@ public class EventSidebar : MonoBehaviour
         internal Exercise exercise;
         internal float repetitionCount;
         internal float durationTime;
+        internal float repetitionTime;
     }
     
     [SerializeField] private GameObject previousExercise;
@@ -17,6 +18,7 @@ public class EventSidebar : MonoBehaviour
     [SerializeField] private GameObject nextExercise;
     [SerializeField] private ExercisesSet exercisesSet;
     [SerializeField] private GameObject endText;
+    
     private Image _currentSprite;
     private Image _nextSprite;
     private Image _previousSprite;
@@ -44,6 +46,7 @@ public class EventSidebar : MonoBehaviour
     private void SetExercisesItems()
     {
         int multiplier = 1;
+        float repTime;
         for (int i = 0; i < exercisesSet.ExercisesInSet.Count; i++)
         {
             if (exercisesSet.ExercisesInSet[i].TwoSideExercise) multiplier = 2;
@@ -51,12 +54,14 @@ public class EventSidebar : MonoBehaviour
             
             for (int j = 0; j < exercisesSet.ExercisesInSet[i].HowManySeries*multiplier; j++)
             {
+                repTime = exercisesSet.ExercisesInSet[i].ExerciseDuration /
+                          exercisesSet.ExercisesInSet[i].HowManySeries;
                 ExerciseItem exerciseItem = new ExerciseItem
                 {
                     exercise = exercisesSet.ExercisesInSet[i].Exercise,
                     repetitionCount = exercisesSet.ExercisesInSet[i].RepetitionCount,
-                    durationTime = exercisesSet.ExercisesInSet[i].ExerciseDuration /
-                                   exercisesSet.ExercisesInSet[i].HowManySeries
+                    durationTime = repTime,
+                    repetitionTime = repTime/exercisesSet.ExercisesInSet[i].RepetitionCount,
                 };
                 
                 _exerciseItems.Add(exerciseItem);
@@ -70,7 +75,9 @@ public class EventSidebar : MonoBehaviour
         _nextSprite.sprite = _exerciseItems[1].exercise.ExerciseSprite;
         GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[0].exercise);
         
-        yield return new WaitForSeconds(_exerciseItems[0].durationTime);
+        StartCoroutine(Repetitions(_exerciseItems[0].repetitionCount, _exerciseItems[0].repetitionTime));
+        yield return new WaitForSeconds(_exerciseItems[0].durationTime + 0.01f);
+        
         _previousSprite.enabled = true;
         _previousSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;;
 
@@ -85,13 +92,24 @@ public class EventSidebar : MonoBehaviour
             }
             
             _nextSprite.sprite = _exerciseItems[i + 1].exercise.ExerciseSprite;
-            yield return new WaitForSeconds(_exerciseItems[i].durationTime);
+            StartCoroutine(Repetitions(_exerciseItems[i].repetitionCount, _exerciseItems[i].repetitionTime));
+            yield return new WaitForSeconds(_exerciseItems[i].durationTime + 0.01f);
             _previousSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
         }
 
-        yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime);
+        yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime + 0.01f );
         _previousSprite.sprite = _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseSprite;
         _currentSprite.enabled = false;
         endText.SetActive(true);
+    }
+
+    private IEnumerator Repetitions(float repCount, float repTime)
+    {
+        GameManager.GameManagerEvents.ResetCurrRepAccuraty();
+        for (int i = 0; i < repCount; i++)
+        {
+            yield return new WaitForSeconds(repTime);
+            GameManager.GameManagerEvents.NextRepetition();
+        }
     }
 }
