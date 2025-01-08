@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -5,7 +6,17 @@ public class ScoreboardManager : MonoBehaviour
 {
     public static ScoreboardManager Instance;
     private int _score;
-    private TMP_Text _scorePoints;
+    [SerializeField] private TMP_Text _scorePoints;
+
+    private void OnEnable()
+    {
+        ScoreboardManagerEvents.AddValue += AddValue;
+    }
+
+    private void OnDisable()
+    {
+        ScoreboardManagerEvents.AddValue -= AddValue;
+    }
 
     private void Awake()
     {
@@ -35,5 +46,10 @@ public class ScoreboardManager : MonoBehaviour
     {
         var newScore = _score + value;
         SetScore(newScore);
+    }
+
+    public static class ScoreboardManagerEvents
+    {
+        public static Action<int> AddValue;
     }
 }
