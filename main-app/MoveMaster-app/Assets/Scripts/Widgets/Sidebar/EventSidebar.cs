@@ -1,18 +1,27 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class EventSidebar : MonoBehaviour
 {
+    private class ExerciseItem
+    {
+        internal Exercise exercise;
+        internal float repetitionCount;
+        internal float durationTime;
+    }
+    
     [SerializeField] private GameObject previousExercise;
     [SerializeField] private GameObject currentExercise;
     [SerializeField] private GameObject nextExercise;
-    [SerializeField] private Exercise[] exercises;
+    [SerializeField] private ExercisesSet exercisesSet;
     [SerializeField] private GameObject endText;
     private Image _currentSprite;
     private Image _nextSprite;
-
     private Image _previousSprite;
+    private Exercise _currentExercise;
+    private List<ExerciseItem> _exerciseItems = new List<ExerciseItem>();
 
     private void Awake()
     {
@@ -24,39 +33,64 @@ public class EventSidebar : MonoBehaviour
     private void Start()
     {
         _previousSprite.enabled = false;
-        if (exercises.Length < 2)
+        if (exercisesSet != null)
         {
-            Debug.LogWarning("Not enough exercise. Minimum quantity: 2");
-            return;
+            SetExercisesItems();
         }
 
         StartCoroutine(ChangeExercise());
     }
 
+    private void SetExercisesItems()
+    {
+        int multiplier = 1;
+        for (int i = 0; i < exercisesSet.ExercisesInSet.Count; i++)
+        {
+            if (exercisesSet.ExercisesInSet[i].TwoSideExercise) multiplier = 2;
+            else multiplier = 1;
+            
+            for (int j = 0; j < exercisesSet.ExercisesInSet[i].HowManySeries*multiplier; j++)
+            {
+                ExerciseItem exerciseItem = new ExerciseItem
+                {
+                    exercise = exercisesSet.ExercisesInSet[i].Exercise,
+                    repetitionCount = exercisesSet.ExercisesInSet[i].RepetitionCount,
+                    durationTime = exercisesSet.ExercisesInSet[i].ExerciseDuration /
+                                   exercisesSet.ExercisesInSet[i].HowManySeries
+                };
+                
+                _exerciseItems.Add(exerciseItem);
+            }
+        }
+    }
+
     private IEnumerator ChangeExercise()
     {
-        _currentSprite.sprite = exercises[0].ExerciseImage;
-        _nextSprite.sprite = exercises[1].ExerciseImage;
-        yield return new WaitForSeconds(exercises[0].DurationTime);
+        _currentSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;
+        _nextSprite.sprite = _exerciseItems[1].exercise.ExerciseSprite;
+        GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[0].exercise);
+        
+        yield return new WaitForSeconds(_exerciseItems[0].durationTime);
         _previousSprite.enabled = true;
-        _previousSprite.sprite = exercises[0].ExerciseImage;
+        _previousSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;;
 
-        for (var i = 1; i < exercises.Length; i++)
+        for (int i = 1; i < _exerciseItems.Count; i++)
         {
-            _currentSprite.sprite = exercises[i].ExerciseImage;
-            if (i + 1 > exercises.Length - 1)
+            _currentSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
+            GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[i].exercise);
+            if (i + 1 > _exerciseItems.Count - 1)
             {
                 _nextSprite.enabled = false;
                 break;
             }
-
-            _nextSprite.sprite = exercises[i + 1].ExerciseImage;
-            yield return new WaitForSeconds(exercises[i].DurationTime);
-            _previousSprite.sprite = exercises[i].ExerciseImage;
+            
+            _nextSprite.sprite = _exerciseItems[i + 1].exercise.ExerciseSprite;
+            yield return new WaitForSeconds(_exerciseItems[i].durationTime);
+            _previousSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
         }
 
-        yield return new WaitForSeconds(exercises[exercises.Length - 1].DurationTime);
-        _previousSprite.sprite = exercises[exercises.Length - 1].ExerciseImage;
+        yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime);
+        _previousSprite.sprite = _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseSprite;
         _currentSprite.enabled = false;
         endText.SetActive(true);
     }
