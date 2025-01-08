@@ -7,5 +7,6 @@
         {
             LatestPredictedClass = latestPredictedClass;
             LatestPredictedConfidence = latestPredictedConfidence;
+            GameManager.GameManagerEvents.CheckExercise(latestPredictedClass, latestPredictedConfidence);
         }
     }
