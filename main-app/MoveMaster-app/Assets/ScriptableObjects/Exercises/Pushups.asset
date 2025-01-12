@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exerciseName: pushups
   exerciseSprite: {fileID: 21300000, guid: 231e485c6cbceec409c5e917278b17c1, type: 3}
-  exerciseAnimation: {fileID: 0}
+  exerciseAnimation: {fileID: 7371119645906579548, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
