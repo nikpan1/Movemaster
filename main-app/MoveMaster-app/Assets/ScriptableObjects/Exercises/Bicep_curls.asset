@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Bicep_curls
   m_EditorClassIdentifier: 
   exerciseName: bicep_curls
-  exerciseSprite: {fileID: 21300000, guid: c22a1234f0937f842b947fc4fda530c2, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 997b31c6fda3f4442874e8181e51f359, type: 3}
   exerciseAnimation: {fileID: 0}

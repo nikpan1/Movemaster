@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Dumbbell_rows
   m_EditorClassIdentifier: 
   exerciseName: dumbbell_rows
-  exerciseSprite: {fileID: 21300000, guid: 7beefec6804b05b4e8f1ee881d23e2db, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 1b3ffe65a61b65347b9b902e25b67a08, type: 3}
   exerciseAnimation: {fileID: 0}

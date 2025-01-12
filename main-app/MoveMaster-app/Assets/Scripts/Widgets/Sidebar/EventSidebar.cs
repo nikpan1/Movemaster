@@ -12,9 +12,12 @@ public class EventSidebar : MonoBehaviour
         internal float durationTime;
         internal float repetitionTime;
     }
-    
+
+    [SerializeField] private GameObject previousExerciseFrame;
     [SerializeField] private GameObject previousExercise;
+    [SerializeField] private GameObject currentExerciseFrame;
     [SerializeField] private GameObject currentExercise;
+    [SerializeField] private GameObject nextExerciseFrame;
     [SerializeField] private GameObject nextExercise;
     [SerializeField] private ExercisesSet exercisesSet;
     [SerializeField] private GameObject endText;
@@ -22,6 +25,7 @@ public class EventSidebar : MonoBehaviour
     private Image _currentSprite;
     private Image _nextSprite;
     private Image _previousSprite;
+
     private Exercise _currentExercise;
     private List<ExerciseItem> _exerciseItems = new List<ExerciseItem>();
 
@@ -34,7 +38,6 @@ public class EventSidebar : MonoBehaviour
 
     private void Start()
     {
-        _previousSprite.enabled = false;
         if (exercisesSet != null)
         {
             SetExercisesItems();
@@ -78,7 +81,7 @@ public class EventSidebar : MonoBehaviour
         StartCoroutine(Repetitions(_exerciseItems[0].repetitionCount, _exerciseItems[0].repetitionTime));
         yield return new WaitForSeconds(_exerciseItems[0].durationTime + 0.01f);
         
-        _previousSprite.enabled = true;
+        previousExerciseFrame.SetActive(true);
         _previousSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;;
 
         for (int i = 1; i < _exerciseItems.Count; i++)
@@ -87,7 +90,7 @@ public class EventSidebar : MonoBehaviour
             GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[i].exercise);
             if (i + 1 > _exerciseItems.Count - 1)
             {
-                _nextSprite.enabled = false;
+                nextExerciseFrame.SetActive(false);
                 break;
             }
             
@@ -99,7 +102,7 @@ public class EventSidebar : MonoBehaviour
 
         yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime + 0.01f );
         _previousSprite.sprite = _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseSprite;
-        _currentSprite.enabled = false;
+        currentExerciseFrame.SetActive(false);
         endText.SetActive(true);
     }
 

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Lunges
   m_EditorClassIdentifier: 
   exerciseName: lunges
-  exerciseSprite: {fileID: 21300000, guid: d769e819e6d258347bab31759937fcc4, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 558098b890e04814d8b83585edcc027d, type: 3}
   exerciseAnimation: {fileID: 0}
