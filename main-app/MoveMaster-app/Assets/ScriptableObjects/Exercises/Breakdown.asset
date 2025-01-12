@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec6b8c9692a4af24e84d1db1952a9287, type: 3}
-  m_Name: Lateral_shoulder_raises
+  m_Name: Breakdown
   m_EditorClassIdentifier: 
-  exerciseName: lateral_shoulder_raises
-  exerciseSprite: {fileID: 21300000, guid: cd2df33c92c5c0b4b95de949627717ad, type: 3}
-  exerciseAnimation: {fileID: -5659375679447416730, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
+  exerciseName: Idle
+  exerciseSprite: {fileID: 21300000, guid: 35dbda55d30dbaa46a11e451e39c4af2, type: 3}
+  exerciseAnimation: {fileID: -3100369314251171874, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}

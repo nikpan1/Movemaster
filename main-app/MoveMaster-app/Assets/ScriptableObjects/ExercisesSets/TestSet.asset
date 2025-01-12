@@ -13,55 +13,45 @@ MonoBehaviour:
   m_Name: TestSet
   m_EditorClassIdentifier: 
   exercisesInSet:
-  - exercise: {fileID: 11400000, guid: 5006b95f8d7322a469b746f4b0567ab6, type: 2}
+  - exercise: {fileID: 11400000, guid: c47d5d69f2228164eb1c802a5b92a1c8, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 5006b95f8d7322a469b746f4b0567ab6, type: 2}
+    howManySeries: 1
+    repetitionCount: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: bf837f06d295ae0468afb97e7666cff9, type: 2}
     howManySeries: 1
-    repetitionCount: 1
-    exerciseDuration: 2
+    repetitionCount: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 7b669b0ef89694d45ab6677b09820713, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: a9014db9f65c776449f8cd039ed1ebd2, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 7227ca68169cf8540847352fdf777a32, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 2bc93860fca920849a8e57828b886d6d, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 0c32aba838d29f243af16ca17bebcf20, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 469471979bb03bd4a92f271c5c55c442, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: 4a93097ea5e112c45aa6b373902343fd, type: 2}
     howManySeries: 1
     repetitionCount: 1
-    exerciseDuration: 2
     twoSideExercise: 0
-  - exercise: {fileID: 11400000, guid: c47d5d69f2228164eb1c802a5b92a1c8, type: 2}
-    howManySeries: 1
-    repetitionCount: 1
-    exerciseDuration: 2
-    twoSideExercise: 0
-  breakDuration: 0
+  breakDuration: 5
   difficultyLevel: 0

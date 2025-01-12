@@ -21,6 +21,7 @@ public class EventSidebar : MonoBehaviour
     [SerializeField] private GameObject nextExercise;
     [SerializeField] private ExercisesSet exercisesSet;
     [SerializeField] private GameObject endText;
+    [SerializeField] private Exercise breakDown;
     
     private Image _currentSprite;
     private Image _nextSprite;
@@ -57,18 +58,26 @@ public class EventSidebar : MonoBehaviour
             
             for (int j = 0; j < exercisesSet.ExercisesInSet[i].HowManySeries*multiplier; j++)
             {
-                repTime = exercisesSet.ExercisesInSet[i].ExerciseDuration /
-                          exercisesSet.ExercisesInSet[i].HowManySeries;
                 ExerciseItem exerciseItem = new ExerciseItem
                 {
                     exercise = exercisesSet.ExercisesInSet[i].Exercise,
                     repetitionCount = exercisesSet.ExercisesInSet[i].RepetitionCount,
-                    durationTime = repTime,
-                    repetitionTime = repTime/exercisesSet.ExercisesInSet[i].RepetitionCount,
+                    durationTime = exercisesSet.ExercisesInSet[i].Exercise.ExerciseAnimation.length * exercisesSet.ExercisesInSet[i].RepetitionCount,
+                    repetitionTime = exercisesSet.ExercisesInSet[i].Exercise.ExerciseAnimation.length
                 };
                 
                 _exerciseItems.Add(exerciseItem);
             }
+
+            ExerciseItem breakdown = new ExerciseItem
+            {
+                exercise = breakDown,
+                repetitionCount = 1,
+                durationTime = exercisesSet.BreakDuration,
+                repetitionTime = exercisesSet.BreakDuration,
+            };
+            
+            _exerciseItems.Add(breakdown);
         }
     }
 
@@ -77,6 +86,7 @@ public class EventSidebar : MonoBehaviour
         _currentSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;
         _nextSprite.sprite = _exerciseItems[1].exercise.ExerciseSprite;
         GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[0].exercise);
+        _currentExercise = _exerciseItems[0].exercise;
         
         StartCoroutine(Repetitions(_exerciseItems[0].repetitionCount, _exerciseItems[0].repetitionTime));
         yield return new WaitForSeconds(_exerciseItems[0].durationTime + 0.01f);
@@ -88,6 +98,7 @@ public class EventSidebar : MonoBehaviour
         {
             _currentSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
             GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[i].exercise);
+            _currentExercise = _exerciseItems[i].exercise;
             if (i + 1 > _exerciseItems.Count - 1)
             {
                 nextExerciseFrame.SetActive(false);
@@ -100,6 +111,8 @@ public class EventSidebar : MonoBehaviour
             _previousSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
         }
 
+        _currentExercise = _exerciseItems[_exerciseItems.Count - 1].exercise;
+        StartCoroutine(Repetitions(_exerciseItems[_exerciseItems.Count - 1].repetitionCount, _exerciseItems[_exerciseItems.Count - 1].repetitionTime));
         yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime + 0.01f );
         _previousSprite.sprite = _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseSprite;
         currentExerciseFrame.SetActive(false);
@@ -111,6 +124,7 @@ public class EventSidebar : MonoBehaviour
         GameManager.GameManagerEvents.ResetCurrRepAccuraty();
         for (int i = 0; i < repCount; i++)
         {
+            Stickman.StickmanEvents.PlayAnimation(_currentExercise.ExerciseName);
             yield return new WaitForSeconds(repTime);
             GameManager.GameManagerEvents.NextRepetition();
         }
