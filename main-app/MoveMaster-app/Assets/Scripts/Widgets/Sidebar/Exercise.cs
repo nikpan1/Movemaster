@@ -5,9 +5,9 @@ public class Exercise : ScriptableObject
 {
     [SerializeField] private string exerciseName;
     [SerializeField] private Sprite exerciseSprite;
-    [SerializeField] private Animation exerciseAnimation;
+    [SerializeField] private AnimationClip exerciseAnimation;
     
     public string ExerciseName => exerciseName;
     public Sprite ExerciseSprite => exerciseSprite;
-    public Animation ExerciseAnimation => exerciseAnimation;
+    public AnimationClip ExerciseAnimation => exerciseAnimation;
 }

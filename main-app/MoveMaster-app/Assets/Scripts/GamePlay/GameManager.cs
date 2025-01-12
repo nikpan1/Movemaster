@@ -68,7 +68,6 @@ public class GameManager : MonoBehaviour
             avarage = sum / _currentRepAccuraty.Count;
             _repAccuraty.Add(avarage);
         }
-        
         _currentRepAccuraty.Clear();
     }
 

@@ -15,9 +15,9 @@ public class ExercisesSet : ScriptableObject
         [SerializeField] private Exercise exercise;
         [SerializeField] int howManySeries;
         [SerializeField] float repetitionCount;
-        [SerializeField] float exerciseDuration;
         [SerializeField] bool twoSideExercise;
         
+        private float exerciseDuration;
         public Exercise Exercise => exercise;
         public int HowManySeries => howManySeries;
         public float RepetitionCount => repetitionCount;
