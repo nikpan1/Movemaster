@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exerciseName: dumbbell_shoulder_press
   exerciseSprite: {fileID: 21300000, guid: bdd9a9cef3e5eaa458c9e528dc1a877d, type: 3}
-  exerciseAnimation: {fileID: 0}
+  exerciseAnimation: {fileID: -8623175401287193567, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
