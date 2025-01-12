@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Squats
   m_EditorClassIdentifier: 
   exerciseName: squats
-  exerciseSprite: {fileID: 21300000, guid: a19a62ad63b5c284480f9113aff431eb, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 9d0da26d5b4f8904c9c5698f9f307bb7, type: 3}
   exerciseAnimation: {fileID: 0}

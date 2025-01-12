@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Situps
   m_EditorClassIdentifier: 
   exerciseName: situps
-  exerciseSprite: {fileID: 21300000, guid: a0432f4b9d0cfe34cb29ce7af9ed3b17, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 1fe055de3bd1a8c40b226a8317defe65, type: 3}
   exerciseAnimation: {fileID: 0}

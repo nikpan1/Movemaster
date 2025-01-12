@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Jumping_jacks
   m_EditorClassIdentifier: 
   exerciseName: jumping_jacks
-  exerciseSprite: {fileID: 21300000, guid: 09685b242c0fae64a98e31ca528af356, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 62517360b53be9445aa18612cd1cbfd0, type: 3}
   exerciseAnimation: {fileID: 0}
