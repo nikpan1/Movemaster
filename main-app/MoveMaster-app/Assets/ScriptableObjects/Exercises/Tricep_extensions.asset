@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Tricep_extensions
   m_EditorClassIdentifier: 
   exerciseName: tricep_extensions
-  exerciseSprite: {fileID: 21300000, guid: 469b21a057806d1449b84625cc1f10d5, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: b444ce090b1dfa3409ee01e4babf8888, type: 3}
   exerciseAnimation: {fileID: 0}

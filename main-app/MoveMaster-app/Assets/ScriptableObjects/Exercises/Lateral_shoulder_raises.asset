@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Lateral_shoulder_raises
   m_EditorClassIdentifier: 
   exerciseName: lateral_shoulder_raises
-  exerciseSprite: {fileID: 21300000, guid: 2881f6f334b1bda428e86ae2648b31aa, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: cd2df33c92c5c0b4b95de949627717ad, type: 3}
   exerciseAnimation: {fileID: 0}
