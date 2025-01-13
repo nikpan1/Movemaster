@@ -5,7 +5,7 @@ import torch
 import uvicorn
 import logging
 
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 
 from ComputerVision.PoseEstimation.ExerciseClassification import ExerciseRecognition, Args
 from Networking.Base64.base64_conversions import *
@@ -61,6 +61,29 @@ class WebcamCaptureServer:
             return {"base64_image": image_to_base64(frame),
                     "latest_predicted_class": self.latest_predicted_class,
                     "latest_predicted_confidence": self.latest_predicted_confidence}
+
+        @self.app.get("/list_cameras")
+        async def list_cameras():
+            """
+            Returns a list of available cameras.
+            """
+            cams = WebcamVideoCapture.list_available_cameras(max_tested=5)
+            return {
+                "cameras": [
+                    {"id": idx, "name": name}
+                    for idx, name in cams
+                ]
+            }
+
+        @self.app.post("/set_camera")
+        async def set_camera(request: Request):
+            """
+            Sets up the camera.
+            """
+            body = await request.json()
+            device_index = body.get("device_index", 0)
+            self.cap.set(device_index)
+            return {"message": f"Camera set to {device_index}"}
 
         @self.app.post("/shutdown")
         async def shutdown(background_tasks: BackgroundTasks):
