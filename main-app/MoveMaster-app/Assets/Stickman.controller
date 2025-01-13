@@ -1,13 +1,13 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1102 &-4854263536932843709
+--- !u!1102 &-8656763205190057734
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pushups
+  m_Name: jumping_jacks
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -20,7 +20,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7371119645906579548, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
+  m_Motion: {fileID: 7400000, guid: 32c11f87470f4d8419019f757a9c7f12, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -171,17 +171,11 @@ AnimatorStateMachine:
     m_State: {fileID: -1521177438806239581}
     m_Position: {x: 130, y: -330, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 3674909883688089154}
-    m_Position: {x: 350, y: -330, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: 8788499529125105455}
     m_Position: {x: 560, y: -330, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2629271264783356403}
     m_Position: {x: 770, y: -330, z: 0}
-  - serializedVersion: 1
-    m_State: {fileID: -4854263536932843709}
-    m_Position: {x: -90, y: -270, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5516036281255659553}
     m_Position: {x: 130, y: -270, z: 0}
@@ -194,6 +188,12 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: -4020680454610545427}
     m_Position: {x: 770, y: -270, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 2712491011925601142}
+    m_Position: {x: -90, y: -270, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: -8656763205190057734}
+    m_Position: {x: 350, y: -330, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -230,6 +230,32 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!1102 &2712491011925601142
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: pushups
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: d6f8e4a58dd58f4458c010a5b30fe3ae, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1102 &3375800687991627337
 AnimatorState:
   serializedVersion: 6
@@ -251,32 +277,6 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 8967385486592034853, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
---- !u!1102 &3674909883688089154
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: jumping_jacks
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: -6042254229860990015, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
