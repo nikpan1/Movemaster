@@ -1,13 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     private Exercise _currentExercise;
+    [SerializeField] private Exercise _previousExercise;
+    [SerializeField] private TextMeshProUGUI countdownText;
     private List<float> _currentRepAccuraty = new List<float>();
     private List<float> _repAccuraty = new List<float>();
+    private int _countdown = 5;
+    private void Start()
+    {
+        StartCoroutine(CountDownToStart());
+    }
+
     private void OnEnable()
     {
         GameManagerEvents.ChangeExercise += ChangeExercise;
@@ -26,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private void ChangeExercise(Exercise exercise)
     {
+        if(_currentExercise != null) _previousExercise = _currentExercise;
         _currentExercise = exercise;
         float points = 0;
         if (_repAccuraty.Count != 0)
@@ -36,13 +47,10 @@ public class GameManager : MonoBehaviour
                 sum += _repAccuraty[i];
             }
             points = Mathf.Round((sum/_repAccuraty.Count)*100);
-            ScoreboardManager.ScoreboardManagerEvents.AddValue((int)points);
         }
-        else
-        {
-            points = 0;
-            ScoreboardManager.ScoreboardManagerEvents.AddValue((int)points);
-        }
+        
+        ScoreboardManager.ScoreboardManagerEvents.AddValue((int)points);
+        MotivationPanel.MotivationPanelEvents.SetMotivationMessage((int)points, _previousExercise.ExerciseName == "Idle");
         _repAccuraty.Clear();
     }
 
@@ -74,6 +82,26 @@ public class GameManager : MonoBehaviour
     private void ResetCurrRepAccuraty()
     {
         _currentRepAccuraty.Clear();
+    }
+
+    private IEnumerator CountDownToStart()
+    {
+        for (int i = _countdown; i >= 0; i--)
+        {
+            if (i != 0)
+            {
+                countdownText.text = i.ToString();
+            }
+            else
+            {
+                countdownText.text = "START";
+            }
+            
+            yield return new WaitForSeconds(1f);
+        }
+
+        countdownText.gameObject.SetActive(false);
+        EventSidebar.EventSidebarEvents.StartExercises();
     }
 
     public static class GameManagerEvents
