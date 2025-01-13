@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,8 +44,16 @@ public class EventSidebar : MonoBehaviour
         {
             SetExercisesItems();
         }
+    }
 
-        StartCoroutine(ChangeExercise());
+    private void OnEnable()
+    {
+        EventSidebarEvents.StartExercises += StartExercises;
+    }
+
+    private void OnDisable()
+    {
+        EventSidebarEvents.StartExercises -= StartExercises;
     }
 
     private void SetExercisesItems()
@@ -89,6 +98,7 @@ public class EventSidebar : MonoBehaviour
         _currentExercise = _exerciseItems[0].exercise;
         
         StartCoroutine(Repetitions(_exerciseItems[0].repetitionCount, _exerciseItems[0].repetitionTime));
+        RepCounter.RepCounterEvents.SetNewRepCounter(_exerciseItems[0].repetitionCount, _exerciseItems[0].exercise.ExerciseName);
         yield return new WaitForSeconds(_exerciseItems[0].durationTime + 0.01f);
         
         previousExerciseFrame.SetActive(true);
@@ -107,12 +117,14 @@ public class EventSidebar : MonoBehaviour
             
             _nextSprite.sprite = _exerciseItems[i + 1].exercise.ExerciseSprite;
             StartCoroutine(Repetitions(_exerciseItems[i].repetitionCount, _exerciseItems[i].repetitionTime));
+            RepCounter.RepCounterEvents.SetNewRepCounter(_exerciseItems[i].repetitionCount, _exerciseItems[i].exercise.ExerciseName);
             yield return new WaitForSeconds(_exerciseItems[i].durationTime + 0.01f);
             _previousSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
         }
 
         _currentExercise = _exerciseItems[_exerciseItems.Count - 1].exercise;
         StartCoroutine(Repetitions(_exerciseItems[_exerciseItems.Count - 1].repetitionCount, _exerciseItems[_exerciseItems.Count - 1].repetitionTime));
+        RepCounter.RepCounterEvents.SetNewRepCounter(_exerciseItems[_exerciseItems.Count - 1].repetitionCount, _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseName);
         yield return new WaitForSeconds(_exerciseItems[_exerciseItems.Count - 1].durationTime + 0.01f );
         _previousSprite.sprite = _exerciseItems[_exerciseItems.Count - 1].exercise.ExerciseSprite;
         currentExerciseFrame.SetActive(false);
@@ -126,7 +138,18 @@ public class EventSidebar : MonoBehaviour
         {
             Stickman.StickmanEvents.PlayAnimation(_currentExercise.ExerciseName);
             yield return new WaitForSeconds(repTime);
+            RepCounter.RepCounterEvents.IncreaseRepCounter();
             GameManager.GameManagerEvents.NextRepetition();
         }
+    }
+
+    private void StartExercises()
+    {
+        StartCoroutine(ChangeExercise());
+    }
+    
+    public static class EventSidebarEvents
+    {
+        public static Action StartExercises;
     }
 }

@@ -49,6 +49,7 @@
     <Compile Include="Assets\Scripts\GamePlay\GameManager.cs" />
     <Compile Include="Assets\Stickman.cs" />
     <Compile Include="Assets\Scripts\FrameCapture\ExerciseInference.cs" />
+    <Compile Include="Assets\Scripts\Widgets\Sidebar\RepCounter.cs" />
     <Compile Include="Assets\Scripts\Widgets\MediaViewer.cs" />
     <Compile Include="Assets\Scripts\FrameCapture\InferencePreview.cs" />
     <Compile Include="Assets\Scripts\UI\MainMenu.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Assets\Scripts\Widgets\Sidebar\EventSidebar.cs" />
     <Compile Include="Assets\Scripts\Networking\ComputerVisionREST\ComputerVisionRESTSettings.cs" />
     <Compile Include="Assets\Scripts\Widgets\Sidebar\Exercise.cs" />
+    <Compile Include="Assets\Scripts\Widgets\Sidebar\MotivationPanel.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
