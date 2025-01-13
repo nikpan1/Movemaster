@@ -4,9 +4,10 @@ import signal
 
 import httpx
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from Networking.Base64.base64_conversions import *
+from Networking.MockerWebcamREST.mocker_video_capture import MockerVideoCapture
 
 
 class MockerCaptureCameraServer:
@@ -55,6 +56,33 @@ class MockerCaptureCameraServer:
             return {"base64_image": image_to_base64(self.mocker.current_frame),
                     "latest_predicted_class": self.mocker.latest_predicted_class,
                     "latest_predicted_confidence": self.mocker.latest_predicted_confidence}
+
+        @self.app.get("/list_cameras")
+        async def list_cameras():
+            """
+            Returns a list of available cameras.
+            """
+            cams = MockerVideoCapture.list_available_cameras(max_tested=5)
+            return {
+                "cameras": [
+                    {"id": idx, "name": name}
+                    for idx, name in cams
+                ]
+            }
+
+        """@self.app.post("/set_camera")
+        async def set_camera(request: Request):
+            try:
+                logging.info("Endpoint /set_camera called")
+                body = await request.json()
+                device_index = body.get("device_index", 0)
+                logging.info(f"Attempting to set camera to device_index: {device_index}")
+                self.cap.set(device_index)
+                logging.info(f"Successfully set camera to device_index: {device_index}")
+                return {"message": f"Camera set to {device_index}"}
+            except Exception as e:
+                logging.error(f"Error in /set_camera: {e}")
+                return {"error": str(e)}, 500"""
 
         @self.app.on_event("shutdown")
         async def shutdown_event():
