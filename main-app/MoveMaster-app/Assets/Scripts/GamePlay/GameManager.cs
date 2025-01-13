@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
 
     private void CheckExercise(string detectedExercise, float accuracy)
     {
+        if (_currentExercise == null) return;
         if (_currentExercise.ExerciseName == detectedExercise)
         {
             _currentRepAccuraty.Add(accuracy);
