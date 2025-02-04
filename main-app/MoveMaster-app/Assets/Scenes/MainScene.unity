@@ -305,7 +305,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Back
+  m_text: Don't press me :(
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e648df7af92d86d46a3aca3a5fa24952, type: 2}
   m_sharedMaterial: {fileID: 420750840445981364, guid: e648df7af92d86d46a3aca3a5fa24952, type: 2}
@@ -332,8 +332,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56
-  m_fontSizeBase: 56
+  m_fontSize: 44
+  m_fontSizeBase: 44
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2119,15 +2119,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3.66
+      value: 2.4
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3.66
+      value: 4.59
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.342
+      value: 0.87996864
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2159,7 +2159,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 792.78
+      value: 263.8
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2179,7 +2179,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4567742316543168748, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6886007932675676538, guid: 577ad78e351df1841b92df42c5c4f757, type: 3}
       propertyPath: m_Name
@@ -2636,7 +2636,7 @@ MonoBehaviour:
   - text: Zwolnij troszke!
     color: {r: 0.87843144, g: 0.40000004, b: 0.40000004, a: 1}
   pulseSpeed: 1
-  pulseScale: 1.3
+  pulseScale: 1.1
   maxRotationAngle: 30
 --- !u!1 &1766158309
 GameObject:
@@ -2720,7 +2720,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1786149907
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2737,7 +2737,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 594.6, y: 143.28}
+  m_AnchoredPosition: {x: 594.6, y: 312.19}
   m_SizeDelta: {x: 1063.2429, y: 166.1277}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1786149908
@@ -2787,8 +2787,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 88
-  m_fontSizeBase: 88
+  m_fontSize: 64
+  m_fontSizeBase: 64
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3731,7 +3731,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -329, y: -16}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 408, y: 139.9904}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6125147599796951492
@@ -3774,8 +3774,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: END
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e648df7af92d86d46a3aca3a5fa24952, type: 2}
+  m_sharedMaterial: {fileID: 420750840445981364, guid: e648df7af92d86d46a3aca3a5fa24952, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3799,14 +3799,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 100
-  m_fontSizeBase: 100
+  m_fontSize: 124
+  m_fontSizeBase: 124
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4039,6 +4039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scorePoints: {fileID: 7279173308428677223}
+  motivationPanel: {fileID: 1765468694}
 --- !u!1 &8021765949801474690
 GameObject:
   m_ObjectHideFlags: 0
