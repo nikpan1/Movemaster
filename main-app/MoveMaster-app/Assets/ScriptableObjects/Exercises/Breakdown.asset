@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Breakdown
   m_EditorClassIdentifier: 
   exerciseName: Idle
-  exerciseSprite: {fileID: 21300000, guid: 35dbda55d30dbaa46a11e451e39c4af2, type: 3}
+  exerciseSprite: {fileID: 21300000, guid: 028a92507ec30604995071d2098b8e37, type: 3}
   exerciseAnimation: {fileID: -3100369314251171874, guid: 899916bce1165324b9cbe92954d2d89b, type: 3}

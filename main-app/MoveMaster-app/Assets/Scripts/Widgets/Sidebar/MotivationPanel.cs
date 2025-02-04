@@ -3,16 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Windows;
+using Random = UnityEngine.Random;
 
 public class MotivationPanel : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI motivationText;
-    private String[] _motivationsStrings = {"Perfect", "Excellent", "Great", "Good", "You can do it better"};
-    [SerializeField] private Color[] _motivationsColors = new Color[5];
-
-    private void OnEnable()
+    [Serializable]
+    class TextVariant
     {
+        [SerializeField] private string text;
+        [SerializeField] private Color color;
+
+        public string Text => text;
+        public Color Color => color;
+    }
+
+    [SerializeField] private TextMeshProUGUI motivationText;
+    [SerializeField] private RectTransform textArea;
+    [SerializeField] private List<TextVariant> textVariants;
+    [SerializeField] private float pulseSpeed = 1f;
+    [SerializeField] private float pulseScale = 1.1f;
+
+    [SerializeField] private float maxRotationAngle = 30f;
+    bool isAnimating = false;
+    
+    private void OnEnable()
+    { 
         MotivationPanelEvents.SetMotivationMessage += SetMotivationMessage;
     }
 
@@ -21,32 +36,49 @@ public class MotivationPanel : MonoBehaviour
         MotivationPanelEvents.SetMotivationMessage -= SetMotivationMessage;
     }
 
-    private void SetMotivationMessage(int score, bool isBreakdown)
+    public void SetMotivationMessage(int score, float latestConfidence)
     {
-        if (isBreakdown) return;
-        if (score <= 100 && score >= 90) SetTextAndColor(0);
-        else if (score < 90 && score >= 75) SetTextAndColor(1);
-        else if (score < 75 && score >= 50) SetTextAndColor(2);
-        else if (score < 50 && score >= 25) SetTextAndColor(3);
-        else SetTextAndColor(4);
+        if (isAnimating) return;
+        int randomIndex = RandomIndex(score);
+        SetTextAndColor(randomIndex);  
+        
+        motivationText.rectTransform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-maxRotationAngle, maxRotationAngle));
         motivationText.gameObject.SetActive(true);
+        isAnimating = true;
+        StartCoroutine(PulseEffect());
         StartCoroutine(HideMotivationMessage());
     }
 
     private void SetTextAndColor(int index)
     {
-        motivationText.text = _motivationsStrings[index];
-        motivationText.color = _motivationsColors[index];
+        motivationText.text = textVariants[index].Text;
+        motivationText.color = textVariants[index].Color;
     }
     
     private IEnumerator HideMotivationMessage()
     {
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(2f);
         motivationText.gameObject.SetActive(false);
+        isAnimating = false;
+    }
+    
+    private IEnumerator PulseEffect()
+    {
+        while (motivationText.gameObject.activeSelf)
+        {
+            float scaleFactor = Mathf.Sin(Time.time * pulseSpeed) * (pulseScale - 1) + 1;
+            motivationText.rectTransform.localScale = new Vector3(scaleFactor, scaleFactor, 1);
+            yield return null;
+        }
+    }
+    
+    private int RandomIndex(int score)
+    {
+        return Random.Range(0, textVariants.Count);
     }
 
     public static class MotivationPanelEvents
     {
-        public static Action<int, bool> SetMotivationMessage;
+        public static Action<int, float> SetMotivationMessage;
     }
 }

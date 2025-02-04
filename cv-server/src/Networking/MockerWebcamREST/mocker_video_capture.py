@@ -10,7 +10,7 @@ class MockerVideoCapture:
         if self.video is not None:
             self.video.release()
 
-        self.video = cv2.VideoCapture(path)
+        self.video = cv2.VideoCapture(1)
 
         if not self.video.isOpened():
             raise ValueError("Unable to open video source", path)
@@ -37,7 +37,8 @@ class MockerVideoCapture:
         if self.video is not None and self.video.isOpened():
             ret, frame = self.video.read()
             if ret:
-                return ret, frame
+                print(frame.shape)
+                return ret, cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
             else:
                 return ret, None
         else:

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,6 +12,7 @@ public class GameManager : MonoBehaviour
     private List<float> _currentRepAccuraty = new List<float>();
     private List<float> _repAccuraty = new List<float>();
     private int _countdown = 5;
+    
     private void Start()
     {
         StartCoroutine(CountDownToStart());
@@ -49,8 +49,8 @@ public class GameManager : MonoBehaviour
             points = Mathf.Round((sum/_repAccuraty.Count)*100);
         }
         
-        ScoreboardManager.ScoreboardManagerEvents.AddValue((int)points);
-        MotivationPanel.MotivationPanelEvents.SetMotivationMessage((int)points, _previousExercise.ExerciseName == "Idle");
+        ScoreboardManager.ScoreboardManagerEvents.AddValue((int)points, 1.0f);
+        // MotivationPanel.MotivationPanelEvents.SetMotivationMessage((int)points);
         _repAccuraty.Clear();
     }
 

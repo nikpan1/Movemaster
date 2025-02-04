@@ -31,6 +31,8 @@ public class EventSidebar : MonoBehaviour
     private Exercise _currentExercise;
     private List<ExerciseItem> _exerciseItems = new List<ExerciseItem>();
 
+    public string currentExerciseName;
+    
     private void Awake()
     {
         _previousSprite = previousExercise.GetComponent<Image>();
@@ -94,6 +96,9 @@ public class EventSidebar : MonoBehaviour
     {
         _currentSprite.sprite = _exerciseItems[0].exercise.ExerciseSprite;
         _nextSprite.sprite = _exerciseItems[1].exercise.ExerciseSprite;
+        
+        currentExerciseName = _exerciseItems[0].exercise.ExerciseName;
+        
         GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[0].exercise);
         _currentExercise = _exerciseItems[0].exercise;
         
@@ -109,6 +114,7 @@ public class EventSidebar : MonoBehaviour
             _currentSprite.sprite = _exerciseItems[i].exercise.ExerciseSprite;
             GameManager.GameManagerEvents.ChangeExercise(_exerciseItems[i].exercise);
             _currentExercise = _exerciseItems[i].exercise;
+            currentExerciseName = _exerciseItems[i].exercise.ExerciseName;
             if (i + 1 > _exerciseItems.Count - 1)
             {
                 nextExerciseFrame.SetActive(false);
