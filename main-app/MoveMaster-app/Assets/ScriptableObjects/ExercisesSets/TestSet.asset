@@ -37,5 +37,25 @@ MonoBehaviour:
     howManySeries: 1
     repetitionCount: 5
     twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 4a93097ea5e112c45aa6b373902343fd, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 343a15bbf9c077b4fa79ec5a25ccaaee, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 343a15bbf9c077b4fa79ec5a25ccaaee, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: bf837f06d295ae0468afb97e7666cff9, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: bf837f06d295ae0468afb97e7666cff9, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
   breakDuration: 8
   difficultyLevel: 0
