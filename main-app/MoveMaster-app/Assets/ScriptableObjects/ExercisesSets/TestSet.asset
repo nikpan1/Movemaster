@@ -17,9 +17,25 @@ MonoBehaviour:
     howManySeries: 1
     repetitionCount: 7
     twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 7227ca68169cf8540847352fdf777a32, type: 2}
+    howManySeries: 1
+    repetitionCount: 10
+    twoSideExercise: 0
   - exercise: {fileID: 11400000, guid: a9014db9f65c776449f8cd039ed1ebd2, type: 2}
     howManySeries: 1
     repetitionCount: 10
     twoSideExercise: 0
-  breakDuration: 5
+  - exercise: {fileID: 11400000, guid: 7b669b0ef89694d45ab6677b09820713, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 2bc93860fca920849a8e57828b886d6d, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  - exercise: {fileID: 11400000, guid: 4a93097ea5e112c45aa6b373902343fd, type: 2}
+    howManySeries: 1
+    repetitionCount: 5
+    twoSideExercise: 0
+  breakDuration: 8
   difficultyLevel: 0

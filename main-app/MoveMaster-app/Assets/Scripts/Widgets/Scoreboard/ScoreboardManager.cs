@@ -8,6 +8,9 @@ public class ScoreboardManager : MonoBehaviour
     private int _score;
     [SerializeField] private TMP_Text _scorePoints;
 
+    [SerializeField]
+    private MotivationPanel motivationPanel;
+    
     private void OnEnable()
     {
         ScoreboardManagerEvents.AddValue += AddValue;
@@ -28,13 +31,20 @@ public class ScoreboardManager : MonoBehaviour
 
     private void Start()
     {
-        SetScore(0);
+        SetScore(0, 1);
     }
 
-    public void SetScore(int newScore)
+    public void SetScore(int newScore, float latestConfidence)
     {
         _score = newScore;
         _scorePoints.SetText(newScore.ToString());
+        
+        if (_score % 200 == 0 && _score > 0)
+        {
+            Debug.Log("Score: " + _score);
+            motivationPanel.SetMotivationMessage(70, latestConfidence);
+        }
+        
     }
 
     public int GetScore()
@@ -42,14 +52,14 @@ public class ScoreboardManager : MonoBehaviour
         return _score;
     }
 
-    public void AddValue(int value)
+    public void AddValue(int value, float latestConfidence)
     {
         var newScore = _score + value;
-        SetScore(newScore);
+        SetScore(newScore, latestConfidence);
     }
 
     public static class ScoreboardManagerEvents
     {
-        public static Action<int> AddValue;
+        public static Action<int, float> AddValue;
     }
 }

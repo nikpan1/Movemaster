@@ -39,6 +39,13 @@ public class PauseMenu : MonoBehaviour
     private void PauseGame()
     {
         if (_isCountingDown) return;
+        if(_paused)
+        {
+            ResumeGame();
+            return;
+        }
+        countdownText.text = "";
+        countdownText.gameObject.SetActive(false);
         _paused = true;
         pausePanel.SetActive(true);
         Time.timeScale = 0;
@@ -86,6 +93,7 @@ public class PauseMenu : MonoBehaviour
 
     private void ChangeGameState(InputAction.CallbackContext context)
     {
+        Debug.Log("hej");
         if (_paused)
         {
             ResumeGame();
