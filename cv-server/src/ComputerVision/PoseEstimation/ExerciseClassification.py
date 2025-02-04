@@ -140,6 +140,7 @@ class ExerciseRecognition:
         _, predicted_class_idx = torch.max(output, dim=1)
         predicted_label = self.labels_list[predicted_class_idx.item()]
         conf = torch.softmax(output, dim=1)[0][predicted_class_idx].item()
+        print(predicted_label)
         return conf, predicted_label
 
     def recognize(self, frame):
