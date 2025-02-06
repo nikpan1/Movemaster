@@ -1,12 +1,10 @@
 import argparse
 import logging
-
 from concurrent.futures import ThreadPoolExecutor
 
-from Networking.MockerWebcamREST.webcam_mocker_application import WebcamMockerApplication
 from Networking.ComputerVisionIPC.computer_vision_ipc import ComputerVisionIpcServer
+from Networking.MockerWebcamREST.webcam_mocker_application import WebcamMockerApplication
 from Networking.WebcamREST.webcam_capture_server import WebcamCaptureServer
-
 
 # Config for logging settings
 logging.basicConfig(

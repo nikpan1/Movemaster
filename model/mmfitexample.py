@@ -11,9 +11,9 @@ import tqdm
 from torch.cuda.amp import autocast, GradScaler
 from torch.utils.data import RandomSampler, ConcatDataset
 
-from model.conv_ae import ConvAutoencoder
-from model.multimodal_ae import SkeletonAutoencoder
-from model.multimodal_ar import SkeletonFcClassifier
+from model.ConvAutoencoder import ConvAutoencoder
+from model.SkeletonAutoencoder import SkeletonAutoencoder
+from model.SkeletonFcClassifier import SkeletonFcClassifier
 from my_utils.dataset import MMFit, SequentialStridedSampler
 
 # Set random seed for reproducibility
@@ -64,16 +64,16 @@ class args:
     epochs = 50
     ae_layers = 3
     ae_hidden_units = 128
-    ae_dropout = 0.40  # Increased dropout for regularization
+    ae_dropout = 0.40
     embedding_units = 86
     layers = 3
     hidden_units = 16
-    dropout = 0.40  # Increased to prevent overfitting
-    lr = 0.0005  # Increased learning rate
-    weight_decay = 0.0005  # Increased for regularization
-    batch_size = 128  # Reduced batch size for better generalization
+    dropout = 0.40
+    lr = 0.0005
+    weight_decay = 0.0005
+    batch_size = 128
     eval_every = 1
-    early_stop = 10  # More aggressive early stopping
+    early_stop = 10
     checkpoint = 1
 
     skeleton_ae_f_in = 2160
@@ -312,11 +312,9 @@ if __name__ == '__main__':
     best_model_state_dict = copy.deepcopy(model.state_dict())
     best_valid_acc = 0.0
     steps_since_improvement = 0
-    print("aaaaa")
     for epoch in range(args.epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion)
         val_loss, val_acc = evaluate(model, val_loader, criterion)
-        print("bbbbbb")
         if val_acc > best_valid_acc:
             best_valid_acc = val_acc
             best_model_state_dict = copy.deepcopy(model.state_dict())

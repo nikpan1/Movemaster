@@ -3,9 +3,8 @@ from mmfitexample import args, instantiate_model
 from my_utils.data_transforms import Unit
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-model_path = ("C:/Users/nikod/Desktop/movemaster-nn/ExerciseClassification/"
-              "output-optimized/best_model.pth")
-video_path = 1
+model_path = ""
+video_path = ""
 
 
 class ExerciseRecognition:
