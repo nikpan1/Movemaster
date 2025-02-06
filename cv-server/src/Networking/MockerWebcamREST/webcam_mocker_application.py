@@ -6,9 +6,8 @@ from tkinter import font as tk_font
 
 import PIL.Image
 import PIL.ImageTk
-import torch
 
-from ComputerVision.PoseEstimation.ExerciseClassification import Args, ExerciseRecognition
+from ComputerVision.PoseEstimation.ExerciseClassification import ExerciseRecognition
 from Networking.MockerWebcamREST.mocker_video_capture import MockerVideoCapture
 from Networking.MockerWebcamREST.webcam_mocker_server import MockerCaptureCameraServer
 
