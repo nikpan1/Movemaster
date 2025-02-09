@@ -14,10 +14,10 @@
   <p align="center">
     A computer vision-based application for learning and practicing strength exercises through engaging gameplay.
     <br />
-    <a href="https://github.com/nikpan1/Movemaster"><strong>Explore the documentation »</strong></a>
+    <a href="docs"><strong>Explore the documentation »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/nikpan1/Movemaster">View Demo</a>
+    <br /> 
+    <a href="docs%2F01.Demo.md">View Demo</a>
     ·
     <a href="https://github.com/nikpan1/Movemaster/issues/new?labels=bug">Report Bug</a>
     ·
@@ -25,34 +25,28 @@
   </p>
 </div>
 
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About the Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
+      <a href="#project-structure">Project Structure</a>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li>
+      <a href="#contributors">Contributors</a>
+    </li>
+    <li>
+      <a href="#workspace">Workspace</a>
+    </li>
+    <li>
+      <a href="#contact">Contact</a>
+    </li>
   </ol>
 </details>
 
- -  -  -  - 
 
 <!-- ABOUT THE PROJECT -->
 ## About the Project
@@ -71,8 +65,6 @@ This project follows an agile (Scrum) methodology. Tools such as Git for version
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
- -  -  -  - 
-
 ## Project Structure
 ```
 /project-root
@@ -87,24 +79,23 @@ This project follows an agile (Scrum) methodology. Tools such as Git for version
 └── ...
 ```
 
- -  -  -  - 
+# Workspace
+
+The project on the taiga that was used during development is now available to everyone, take a look below:</br>
+https://tree.taiga.io/project/nikpan1-gruz-kasztany-i-szarlotki
+
+![8.png](docs%2Fimages%2F8.png)
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+# Contact
+Feel free to contact us if needed </br>
+nikpan1 – 
+```nikodem.panknin@gmail.com```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 # Contributors
-We extend our gratitude to everyone who has contributed to the development and improvement of Movemaster. Your feedback, pull requests, and suggestions make this project stronger.
+We extend our gratitude to everyone who has contributed to the development and improvement of Movemaster. Your feedback, pull requests, and suggestions made this project awesome.
 
 <a href="https://github.com/nikpan1/Movemaster/graphs/contributors"> <img src="https://contrib.rocks/image?repo=nikpan1/Movemaster" alt="Contributors" /> </a></br>
 <p align="right">(<a href="#readme-top">back to top</a>)</p> <!-- CONTACT -->
-
- -  -  -  - 
-
-# Contact
-Project Maintainer</br>
-nikpan1 – nikodem.panknin@gmail.com</br>
-https://github.com/nikpan1/Movemaster
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p> <!-- ACKNOWLEDGMENTS -->
-
-
-# Workspace
-The project on the taiga that was used during development is now available to everyone, take a look below:</br>
-https://tree.taiga.io/project/nikpan1-gruz-kasztany-i-szarlotki
